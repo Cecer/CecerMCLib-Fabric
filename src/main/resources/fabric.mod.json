@@ -1,0 +1,31 @@
+{
+    "schemaVersion": 1,
+    "id": "cecermclib-fabric",
+    "version": "${version}",
+    "name": "CecerMCLib (for Fabric)",
+    "description": "",
+    "authors": [
+        "Cecer"
+    ],
+    "contact": {
+        "website": "https://www.cecer1.com/"
+    },
+    "license": "MIT",
+    "environment": "*",
+    "entrypoints": {
+        "client": [
+            "com.cecer1.projects.mc.cecermclib.fabric.environment.mod.CecerMCLibFabricClient"
+        ],
+        "server": [
+            "com.cecer1.projects.mc.cecermclib.fabric.environment.mod.CecerMCLibFabricServer"
+        ]
+    },
+    "mixins": [
+        "cecermclib-fabric.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=0.11.6",
+        "fabric": "*",
+        "minecraft": "*"
+    }
+}
