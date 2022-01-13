@@ -1,4 +1,4 @@
-package com.cecer1.projects.mc.cecermclib.fabric.modules.overlaytest.fbo;
+package com.cecer1.projects.mc.cecermclib.fabric.modules.rendering.fbo;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;

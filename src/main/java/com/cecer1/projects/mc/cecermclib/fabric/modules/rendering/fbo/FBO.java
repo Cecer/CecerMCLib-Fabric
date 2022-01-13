@@ -1,4 +1,4 @@
-package com.cecer1.projects.mc.cecermclib.fabric.modules.overlaytest.fbo;
+package com.cecer1.projects.mc.cecermclib.fabric.modules.rendering.fbo;
 
 import com.cecer1.projects.mc.cecermclib.fabric.modules.rendering.context.RenderContext;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -77,20 +77,20 @@ public class FBO {
 	/**
 	 * Draw this FBO
 	 */
-	public void draw(MatrixStack matrices, int x, int y) {
-		this.draw(matrices, x, y, this.resources.getBufferWidth(), this.resources.getBufferHeight(), 1.0f);
+	public void draw(MatrixStack matrixStack, int x, int y) {
+		this.draw(matrixStack, x, y, this.resources.getBufferWidth(), this.resources.getBufferHeight(), 1.0f);
 	}
 	/**
 	 * Draw this FBO
 	 */
-	public void draw(MatrixStack matrices, int x, int y, float alpha) {
-		this.draw(matrices, x, y, this.resources.getBufferWidth(), this.resources.getBufferHeight(), alpha);
+	public void draw(MatrixStack matrixStack, int x, int y, float alpha) {
+		this.draw(matrixStack, x, y, this.resources.getBufferWidth(), this.resources.getBufferHeight(), alpha);
 	}
 
 	/**
 	 * Draw this FBO
 	 */
-	public void draw(MatrixStack matrices, int atX, int atY, int width, int height, float alpha) {
+	public void draw(MatrixStack matrixStack, int atX, int atY, int width, int height, float alpha) {
 		if (this.resources == null) {
 			throw new IllegalStateException("The FBO resources have been disposed!");
 		}
@@ -109,7 +109,7 @@ public class FBO {
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-		Matrix4f matrix = matrices.peek().getPositionMatrix();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		bufferBuilder.vertex(matrix, (float)x, (float)y2, 0f).texture(0f, 0f).next();
 		bufferBuilder.vertex(matrix, (float)x2, (float)y2, 0f).texture(1f, 0f).next();
 		bufferBuilder.vertex(matrix, (float)x2, (float)y, 0f).texture(1f, 1f).next();
