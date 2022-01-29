@@ -28,7 +28,7 @@ public class OverlayTestModule implements IModule {
     }
     
     @Override
-    public void onModuleRegistered() {
+    public void onModuleRegister() {
         HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> { 
             Window window = MinecraftClient.getInstance().getWindow();
             this.drawTest(matrixStack, -1, -1, tickDelta, window.getScaledWidth(), window.getScaledHeight());

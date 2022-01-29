@@ -2,6 +2,7 @@ package com.cecer1.projects.mc.cecermclib.fabric.environment;
 
 import com.cecer1.projects.mc.cecermclib.common.config.ICecerMCLibConfig;
 import com.cecer1.projects.mc.cecermclib.common.environment.IServerEnvironment;
+import com.cecer1.projects.mc.cecermclib.common.modules.ModuleRegistrationCallback;
 import net.minecraft.server.MinecraftServer;
 
 public class FabricServerEnvironment extends AbstractFabricEnvironment implements IServerEnvironment {
@@ -14,9 +15,9 @@ public class FabricServerEnvironment extends AbstractFabricEnvironment implement
     }
 
     @Override
-    public void registerModules() {
-        super.registerModules();
-        this.registerSideModules();
+    public void registerModules(ModuleRegistrationCallback.RegistrationContext ctx) {
+        super.registerModules(ctx);
+        this.registerSideModules(ctx);
     }
 
     public MinecraftServer getMinecraftServer() {

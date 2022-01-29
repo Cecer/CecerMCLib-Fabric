@@ -14,10 +14,10 @@
     "environment": "*",
     "entrypoints": {
         "client": [
-            "com.cecer1.projects.mc.cecermclib.fabric.environment.mod.CecerMCLibFabricClient"
+            "com.cecer1.projects.mc.cecermclib.fabric.environment.mod.CecerMCLibFabricClientMod"
         ],
         "server": [
-            "com.cecer1.projects.mc.cecermclib.fabric.environment.mod.CecerMCLibFabricServer"
+            "com.cecer1.projects.mc.cecermclib.fabric.environment.mod.CecerMCLibFabricServerMod"
         ]
     },
     "mixins": [

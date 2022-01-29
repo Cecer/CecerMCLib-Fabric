@@ -9,14 +9,14 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.minecraft.client.MinecraftClient;
 
 @Environment(EnvType.CLIENT)
-public class CecerMCLibFabricClient implements ClientModInitializer {
+public class CecerMCLibFabricClientMod extends BaseCecerMCLibFabricMod implements ClientModInitializer {
+    
     @Override
     public void onInitializeClient() {
-        ClientLifecycleEvents.CLIENT_STARTED.register(this::onStart);
-    }
-
-    private void onStart(MinecraftClient minecraftClient) {
-        CecerMCLib.initEnvironment(new FabricClientEnvironment());
+        ClientLifecycleEvents.CLIENT_STARTED.register(this::onStarting);
     }
     
+    protected void onStarting(MinecraftClient minecraftClient) {
+        CecerMCLib.initEnvironment(new FabricClientEnvironment());
+    }
 }

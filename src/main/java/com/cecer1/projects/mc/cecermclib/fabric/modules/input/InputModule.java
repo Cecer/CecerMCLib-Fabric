@@ -1,5 +1,6 @@
 package com.cecer1.projects.mc.cecermclib.fabric.modules.input;
 
+import com.cecer1.projects.mc.cecermclib.common.modules.AllModulesInitialisedCallback;
 import com.cecer1.projects.mc.cecermclib.common.modules.IModule;
 import com.cecer1.projects.mc.cecermclib.fabric.modules.input.keyboard.KeyboardInputManager;
 import com.cecer1.projects.mc.cecermclib.fabric.modules.input.mouse.MouseInputManager;
@@ -16,10 +17,8 @@ public class InputModule implements IModule {
         return this.keyboardInputManager;
     }
 
-    // TODO: Some kind of key binding stuff
-
     @Override
-    public void onInitModule() {
-        this.keyboardInputManager.registerEvents();
+    public void onModuleRegister() {
+        AllModulesInitialisedCallback.EVENT.register(this.keyboardInputManager::registerEvents);
     }
 }

@@ -9,13 +9,14 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.server.MinecraftServer;
 
 @Environment(EnvType.SERVER)
-public class CecerMCLibFabricServer implements DedicatedServerModInitializer {
+public class CecerMCLibFabricServerMod extends BaseCecerMCLibFabricMod implements DedicatedServerModInitializer {
+
     @Override
     public void onInitializeServer() {
-        ServerLifecycleEvents.SERVER_STARTING.register(this::onStart);
+        ServerLifecycleEvents.SERVER_STARTING.register(this::onStarting);
     }
 
-    private void onStart(MinecraftServer minecraftServer) {
+    protected void onStarting(MinecraftServer minecraftServer) {
         CecerMCLib.initEnvironment(new FabricServerEnvironment(minecraftServer));
     }
 }

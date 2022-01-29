@@ -37,7 +37,7 @@ public class RenderingModule implements IModule {
     }
 
     @Override
-    public void onModuleRegistered() {
+    public void onModuleRegister() {
         HudRenderCallback.EVENT.register(this::renderGameOverlay);
         ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
             ScreenEvents.beforeRender(screen).register((ignore, matrices, mouseX, mouseY, tickDelta) -> {
