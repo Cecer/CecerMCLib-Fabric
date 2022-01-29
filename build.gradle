@@ -17,6 +17,7 @@ repositories {
     // See https://docs.gradle.org/current/userguide/declaring_repositories.html
     // for more information about repositories.
     mavenLocal()
+    mavenCentral()
 }
 
 dependencies {
@@ -32,7 +33,7 @@ dependencies {
     include "com.cecer1.projects.mc.cecermclib:cecermclib-common:${project.mod_version}"
     
 //    implementation files("../common/target/cecermclib-common-${project.cecermclib_common_version}.jar")
-    compileOnly "org.checkerframework:checker-qual:3.18.1"
+    compileOnly "org.checkerframework:checker-qual:3.21.1"
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
@@ -53,8 +54,8 @@ tasks.withType(JavaCompile).configureEach {
     // If Javadoc is generated, this must be specified in that task too.
     it.options.encoding = "UTF-8"
 
-    // Minecraft 1.17 (21w19a) upwards uses Java 16.
-    it.options.release = 16
+    // Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
+    it.options.release = 17
 }
 
 java {
