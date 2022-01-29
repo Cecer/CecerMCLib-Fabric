@@ -25,7 +25,7 @@ public class TagResourceMetadataReader implements ResourceMetadataReader<TagReso
 
     @Override
     public TagResourceMetadata fromJson(JsonObject obj) {
-        int formatVersion = JsonHelper.getInt(obj, "formatVersion");
+        int formatVersion = JsonHelper.getInt(obj, "formatVersion", -1);
         if (formatVersion != FORMAT_VERSION) {
             throw new JsonParseException(String.format("Unsupported tags smart texture metadata version! supports %d but found %d", FORMAT_VERSION, formatVersion));
         }

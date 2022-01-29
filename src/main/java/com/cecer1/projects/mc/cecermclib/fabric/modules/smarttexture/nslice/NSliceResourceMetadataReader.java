@@ -22,7 +22,7 @@ public class NSliceResourceMetadataReader implements ResourceMetadataReader<NSli
 
     @Override
     public NSliceResourceMetadata fromJson(JsonObject obj) {
-        int formatVersion = JsonHelper.getInt(obj, "formatVersion");
+        int formatVersion = JsonHelper.getInt(obj, "formatVersion", -1);
         if (formatVersion != FORMAT_VERSION) {
             throw new JsonParseException(String.format("Unsupported smarttexture tag metadata version! supports %d but found %d", FORMAT_VERSION, formatVersion));
         }
