@@ -4,6 +4,7 @@ import com.cecer1.projects.mc.cecermclib.common.config.ICecerMCLibConfig;
 import com.cecer1.projects.mc.cecermclib.common.environment.IClientEnvironment;
 import com.cecer1.projects.mc.cecermclib.common.modules.ModuleRegistrationCallback;
 import com.cecer1.projects.mc.cecermclib.fabric.modules.input.InputModule;
+import com.cecer1.projects.mc.cecermclib.fabric.modules.rendering.RenderingModule;
 
 public class FabricClientEnvironment extends AbstractFabricEnvironment implements IClientEnvironment {
 
@@ -16,6 +17,7 @@ public class FabricClientEnvironment extends AbstractFabricEnvironment implement
         super.registerModules(ctx);
         this.registerSideModules(ctx);
         ctx.registerModule(new InputModule());
+        ctx.registerModule(new RenderingModule());
 //        ctx.registerModule(new OverlayTestModule());
     }
 
