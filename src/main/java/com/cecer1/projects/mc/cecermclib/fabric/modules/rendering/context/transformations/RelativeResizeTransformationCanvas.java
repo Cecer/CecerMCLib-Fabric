@@ -8,10 +8,17 @@ public class RelativeResizeTransformationCanvas extends AbstractTransformationCa
     private int x;
     private int y;
 
-    public RelativeResizeTransformationCanvas(AbstractCanvas parentCanvas, RenderContext ctx, int x, int y) {
+    public RelativeResizeTransformationCanvas(AbstractCanvas parentCanvas, RenderContext ctx, int deltaX, int deltaY) {
         super(parentCanvas, ctx);
-        this.x = x;
-        this.y = y;
+        if (deltaX > 0|| deltaY > 0) {
+            throw new IllegalArgumentException(String.format("Growing of the canvas is not allowed. {parentWidth=%d; parentHeight=%d; deltaX=%d; deltaY=%d}",
+                    this.getParentCanvas().getWidth(),
+                    this.getParentCanvas().getHeight(),
+                    deltaX, deltaY));
+        }
+        
+        this.x = deltaX;
+        this.y = deltaY;
     }
 
     @Override

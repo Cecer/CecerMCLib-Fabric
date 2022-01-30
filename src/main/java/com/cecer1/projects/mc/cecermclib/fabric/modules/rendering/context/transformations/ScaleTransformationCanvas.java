@@ -9,6 +9,10 @@ public class ScaleTransformationCanvas extends AbstractTransformationCanvas {
 
     public ScaleTransformationCanvas(AbstractCanvas parentCanvas, RenderContext ctx, float scaleFactor) {
         super(parentCanvas, ctx);
+        if (scaleFactor <= 0) {
+            throw new IllegalArgumentException(String.format("Negative or zero scale factors are not allowed. {scaleFactor=%f}", scaleFactor));
+        }
+        
         this.scaleFactor = scaleFactor;
     }
 

@@ -32,20 +32,15 @@ public class TransformCanvasBuilder {
 
     public TransformCanvasBuilder absoluteResize(int width, int height) {
         if (width < 0|| height < 0) {
-            throw new IllegalArgumentException("Negative canvas size is not allowed.");
+            throw new IllegalArgumentException(String.format("Negative canvas size is not allowed. {width=%d; height=%d}", width, height));
         }
         
         int deltaX = width - this.getLastTransformationOrParent().getWidth();
         int deltaY = height - this.getLastTransformationOrParent().getHeight();
-        return this.relativeResize(deltaX, deltaY); // TODO: This is currently relative. Make it absolute
+        return this.relativeResize(deltaX, deltaY);
     }
 
     public TransformCanvasBuilder relativeResize(int deltaX, int deltaY) {
-        // TODO: Move this into ResizeCanvasTransformation
-        if (deltaX > 0|| deltaY > 0) {
-            throw new IllegalArgumentException("Growing of the canvas is not allowed.");
-        }
-
         this.lastTransformations.add(new RelativeResizeTransformationCanvas(this.getLastTransformationOrParent(), this.ctx, deltaX, deltaY));
         return this;
     }
@@ -55,14 +50,13 @@ public class TransformCanvasBuilder {
     }
 
     public TransformCanvasBuilder scale(float scaleFactor) {
-        if (scaleFactor <= 0) {
-            throw new IllegalArgumentException("Negative or zero scale factors are not allowed.");
-        }
         this.lastTransformations.add(new ScaleTransformationCanvas(this.getLastTransformationOrParent(), this.ctx, scaleFactor));
         return this;
     }
 
-    public TransformCanvas buildTransformation() {
-        return new TransformCanvas(this.lastTransformations.toArray(new AbstractTransformationCanvas[0]), ctx);
+    public TransformCanvas openTransformation() {
+        TransformCanvas canvas = new TransformCanvas(this.parentCanvas, this.lastTransformations.toArray(new AbstractTransformationCanvas[0]), ctx);
+        canvas.open();
+        return canvas;
     }
 }

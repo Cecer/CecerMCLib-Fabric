@@ -95,7 +95,7 @@ public class RenderingModule implements IModule {
                 try (AbstractStandardCanvas canvas = ctx.getCanvas().transform()
                         .translate(handler.getMinX(), handler.getMinY())
                         .absoluteResize(handler.getMaxX() - handler.getMinX(), handler.getMaxY() - handler.getMinY())
-                        .buildTransformation()
+                        .openTransformation()
                         .open()) {
 
 
