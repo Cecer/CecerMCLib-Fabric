@@ -9,8 +9,8 @@ public class TransformCanvas extends AbstractStandardCanvas {
 
     private final AbstractTransformationCanvas[] transformations;
 
-    public TransformCanvas(AbstractTransformationCanvas[] transformations, RenderContext ctx) {
-        super(transformations[transformations.length-1], ctx);
+    public TransformCanvas(AbstractCanvas parentCanvas, AbstractTransformationCanvas[] transformations, RenderContext ctx) {
+        super(parentCanvas, ctx);
         this.transformations = transformations;
     }
 
