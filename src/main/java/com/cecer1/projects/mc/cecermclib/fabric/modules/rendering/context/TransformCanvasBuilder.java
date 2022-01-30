@@ -31,17 +31,23 @@ public class TransformCanvasBuilder {
     }
 
     public TransformCanvasBuilder absoluteResize(int width, int height) {
-        if (width < 0|| height < 0) {
+        return this.absoluteResize(width, height, false);
+    }
+    public TransformCanvasBuilder absoluteResize(int width, int height, boolean allowGrowth) {
+        if (width < 0 || height < 0) {
             throw new IllegalArgumentException(String.format("Negative canvas size is not allowed. {width=%d; height=%d}", width, height));
         }
         
         int deltaX = width - this.getLastTransformationOrParent().getWidth();
         int deltaY = height - this.getLastTransformationOrParent().getHeight();
-        return this.relativeResize(deltaX, deltaY);
+        return this.relativeResize(deltaX, deltaY, allowGrowth);
     }
 
     public TransformCanvasBuilder relativeResize(int deltaX, int deltaY) {
-        this.lastTransformations.add(new RelativeResizeTransformationCanvas(this.getLastTransformationOrParent(), this.ctx, deltaX, deltaY));
+        return this.relativeResize(deltaX, deltaY, false);
+    }
+    public TransformCanvasBuilder relativeResize(int deltaX, int deltaY, boolean allowGrowth) {
+        this.lastTransformations.add(new RelativeResizeTransformationCanvas(this.getLastTransformationOrParent(), this.ctx, deltaX, deltaY, allowGrowth));
         return this;
     }
 
