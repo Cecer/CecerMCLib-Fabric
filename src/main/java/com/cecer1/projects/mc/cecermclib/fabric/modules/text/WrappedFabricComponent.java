@@ -1,6 +1,5 @@
 package com.cecer1.projects.mc.cecermclib.fabric.modules.text;
 
-import com.cecer1.projects.mc.cecermclib.common.CecerMCLib;
 import com.cecer1.projects.mc.cecermclib.common.modules.text.ChatInputMutateCallback;
 import com.cecer1.projects.mc.cecermclib.common.modules.text.TextColor;
 import com.cecer1.projects.mc.cecermclib.common.modules.text.WrappedComponent;
@@ -10,7 +9,6 @@ import net.minecraft.text.ClickEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
 import java.util.List;
 
@@ -22,11 +20,11 @@ public class WrappedFabricComponent extends WrappedComponent<MutableText> {
     
     @Override
     public String getPlainString() {
-        return Formatting.strip(this.getComponent().getString());
+        return this.getComponent().getString();
     }
     @Override
     public String getFormattedString() {
-        return this.getComponent().toString();
+        throw new UnsupportedOperationException("Not implemented");
     }
     @Override
     public String getJson() {
