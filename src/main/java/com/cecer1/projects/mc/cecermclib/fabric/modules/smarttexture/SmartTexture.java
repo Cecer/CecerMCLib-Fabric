@@ -48,6 +48,9 @@ public class SmartTexture {
     
     private IScalableRenderer renderer;
     private ICoordRescaler coordRescaler;
+    
+    private final int minWidth;
+    private final int minHeight;
 
     public static SmartTexture fromIdentifier(Identifier identifier) {
         try {
@@ -85,6 +88,17 @@ public class SmartTexture {
             this.renderer = SimpleRenderer.INSTANCE;
             this.coordRescaler = NullCoordRescaler.INSTANCE;
         }
+
+        int inc = 0;
+        for (NSliceResourceMetadata.Slice slice : this.nsliceMetadata.getColumns()) {
+            inc += slice.size;
+        }
+        this.minWidth = inc;
+        inc = 0;
+        for (NSliceResourceMetadata.Slice slice : this.nsliceMetadata.getRows()) {
+            inc += slice.size;
+        }
+        this.minHeight = inc;
     }
     
     private AbstractTexture getTexture() {
@@ -94,24 +108,28 @@ public class SmartTexture {
     public void draw(MatrixStack matrixStack, int targetWidth, int targetHeight) {
         this.renderer.draw(matrixStack, this.getTexture(), targetWidth, targetHeight);
     }
-    public TransformCanvas selectSlot(@NotNull String name, int targetWidth, int targetHeight, RenderContext ctx) {
+    public TransformCanvas selectSlot(@NotNull String name, RenderContext ctx) {
+        return this.selectSlot(name, ctx.getCanvas().getWidth(), ctx.getCanvas().getHeight(), ctx);
+    }
+    public TransformCanvas selectSlot(@NotNull String name, int totalWidth, int totalHeight, RenderContext ctx) {
         if (this.slotsMetadata == null) {
             // No slot metadata, do nothing.
-            return ctx.getCanvas().transform().buildTransformation();
+            return ctx.getCanvas().transform().openTransformation();
         }
+        
+        int targetWidth = totalWidth - this.getSlotMarginX(name, totalWidth);
+        int targetHeight = totalWidth - this.getSlotMarginY(name, totalHeight);
         
         SlotsResourceMetadata.Slot slot = this.slotsMetadata.getSlot(name);
         return ctx.getCanvas().transform()
                 .translate(
                         this.coordRescaler.scaleX(slot.x, targetWidth, targetHeight),
                         this.coordRescaler.scaleY(slot.y, targetWidth, targetHeight))
-                .absoluteResize(
-                        slot.x - this.coordRescaler.scaleX(slot.x + slot.width, targetWidth, targetHeight),
-                        slot.y - this.coordRescaler.scaleY(slot.y + slot.height, targetWidth, targetHeight))
-                .buildTransformation();
+                .absoluteResize(totalWidth, totalHeight)
+                .openTransformation();
     }
 
-    public Set<String> getTagAt(int x, int y, int targetWidth, int targetHeight) {
+    public Set<String> getTagsAt(int x, int y, int targetWidth, int targetHeight) {
         if (this.tagsMetadata == null) {
             // No tag metadata, do nothing.
             return Collections.emptySet();
@@ -123,14 +141,22 @@ public class SmartTexture {
         
         return this.tagsMetadata.getTags(color);
     }
-    
+
+
     public int getSlotMarginX(String name) {
-        SlotsResourceMetadata.Slot slot = this.slotsMetadata.getSlot(name);
-        return 1000000 - (this.coordRescaler.scaleX(slot.x + slot.width, 1000000, 1) - this.coordRescaler.scaleX(slot.x, 1000000, 1));
+        return this.getSlotMarginX(name, this.minWidth);
     }
     public int getSlotMarginY(String name) {
+        return this.getSlotMarginY(name, this.minHeight);
+    }
+    
+    public int getSlotMarginX(String name, int totalWidth) {
         SlotsResourceMetadata.Slot slot = this.slotsMetadata.getSlot(name);
-        return 1000000 - (this.coordRescaler.scaleY(slot.y + slot.height, 1, 1000000) - this.coordRescaler.scaleY(slot.y, 1, 1000000));
+        return totalWidth - (this.coordRescaler.scaleX(slot.x + slot.width, totalWidth, 1) - this.coordRescaler.scaleX(slot.x, totalWidth, 1));
+    }
+    public int getSlotMarginY(String name, int totalHeight) {
+        SlotsResourceMetadata.Slot slot = this.slotsMetadata.getSlot(name);
+        return totalHeight - (this.coordRescaler.scaleY(slot.y + slot.height, 1, totalHeight) - this.coordRescaler.scaleY(slot.y, 1, totalHeight));
     }
     
 
