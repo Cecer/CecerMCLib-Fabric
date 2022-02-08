@@ -22,6 +22,8 @@ public class OverlayTestModule implements IModule {
 
     private int frameCounter = 0;
     
+    public static boolean disabled = false;
+    
     @Override
     public boolean isEnvironmentSupported(AbstractEnvironment environment) {
         return environment instanceof FabricClientEnvironment;
@@ -35,7 +37,7 @@ public class OverlayTestModule implements IModule {
         });
         ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
             ScreenEvents.beforeRender(screen).register((ignore, matrixStack, mouseX, mouseY, tickDelta) -> {
-                if (MinecraftClient.getInstance().currentScreen == null) {
+                if (MinecraftClient.getInstance().currentScreen == null && !disabled) {
                     this.drawTest(matrixStack, mouseX, mouseY, tickDelta, scaledWidth, scaledHeight);
                 }
             });
