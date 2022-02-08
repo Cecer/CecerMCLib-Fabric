@@ -51,8 +51,10 @@ public class DrawMethods {
         drawColoredTexturedQuad(matrixStack, texture.getGlId(), x, y, width, height, srcX, srcY, srcWidth, srcHeight, color);
     }
     public static void drawColoredTexturedQuad(MatrixStack matrixStack, int textureId, int x, int y, int width, int height, float srcX, float srcY, float srcWidth, float srcHeight, int color) {
-        int x1 = x + width;
-        int y1 = y + height;
+        int xEnd = x + width;
+        int yEnd = y + height;
+        float srcXEnd = srcX + srcWidth;
+        float srcYEnd = srcY + srcHeight;
         
         Matrix4f matrix = matrixStack.peek().getPositionMatrix();
         
@@ -62,10 +64,10 @@ public class DrawMethods {
         
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-        bufferBuilder.vertex(matrix, (float)x, (float)y1, 0).texture(srcX, srcHeight).color(color).next();
-        bufferBuilder.vertex(matrix, (float)x1, (float)y1, 0).texture(srcY, srcHeight).color(color).next();
-        bufferBuilder.vertex(matrix, (float)x1, (float)y, 0).texture(srcY, srcWidth).color(color).next();
-        bufferBuilder.vertex(matrix, (float)x, (float)y, 0).texture(srcX, srcWidth).color(color).next();
+        bufferBuilder.vertex(matrix, x,    yEnd, 0) .texture(srcX,    srcYEnd) .color(color) .next();
+        bufferBuilder.vertex(matrix, xEnd, yEnd, 0) .texture(srcXEnd, srcYEnd) .color(color) .next();
+        bufferBuilder.vertex(matrix, xEnd, y,    0) .texture(srcXEnd, srcY)    .color(color) .next();
+        bufferBuilder.vertex(matrix, x,    y,    0) .texture(srcX,    srcY)    .color(color) .next();
         bufferBuilder.end();
         BufferRenderer.draw(bufferBuilder);
     }
