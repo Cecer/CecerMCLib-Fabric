@@ -47,7 +47,7 @@ public class NSliceCoordRescaler implements ICoordRescaler {
                 break;
             }
             unscaledPixelsBeforeSlice += slices[sliceIndex].size;
-            scaledPixelsBeforeSlice += divisionData.sizesPixels[sliceIndex];
+            scaledPixelsBeforeSlice += divisionData.targetSizesPixels[sliceIndex];
         }
         // unscaledPixelsBeforeSlice, scaledPixelsBeforeSlice and sliceIndex now contain their final values.
         
@@ -58,7 +58,7 @@ public class NSliceCoordRescaler implements ICoordRescaler {
         double positionRelativeToSliceNormalised = (double) unscaledPositionRelativeToSliceStart / slices[sliceIndex].size;
         
         // How many scaled pixels the scaled position is beyond the start of the scaled containing slice.
-        int scaledPositionRelativeToSliceStart = (int) (divisionData.sizesPixels[sliceIndex] * positionRelativeToSliceNormalised);
+        int scaledPositionRelativeToSliceStart = (int) (divisionData.targetSizesPixels[sliceIndex] * positionRelativeToSliceNormalised);
 
         // Add the scaled slice pixels before the position to the scaled pixels before the slice entirely... and we're done!
         return scaledPixelsBeforeSlice + scaledPositionRelativeToSliceStart;
@@ -76,12 +76,12 @@ public class NSliceCoordRescaler implements ICoordRescaler {
         // This WILL hold the slice index containing our position.
         int sliceIndex = 0;
         for (; sliceIndex < slices.length; sliceIndex++) {
-            if (scaledPixelsBeforeSlice + divisionData.sizesPixels[sliceIndex] > scaledPosition) {
+            if (scaledPixelsBeforeSlice + divisionData.targetSizesPixels[sliceIndex] > scaledPosition) {
                 // We have reached the slice containing the position. Break out of the loop!
                 break;
             }
             unscaledPixelsBeforeSlice += slices[sliceIndex].size;
-            scaledPixelsBeforeSlice += divisionData.sizesPixels[sliceIndex];
+            scaledPixelsBeforeSlice += divisionData.targetSizesPixels[sliceIndex];
         }
         // unscaledPixelsBeforeSlice, scaledPixelsBeforeSlice and sliceIndex now contain their final values.
 
@@ -89,7 +89,7 @@ public class NSliceCoordRescaler implements ICoordRescaler {
         int scaledPositionRelativeToSliceStart = scaledPosition - scaledPixelsBeforeSlice;
 
         // The percentage (0-1) of the containing slice that is before the position.
-        double positionRelativeToSliceNormalised = (double) scaledPositionRelativeToSliceStart / divisionData.sizesPixels[sliceIndex];
+        double positionRelativeToSliceNormalised = (double) scaledPositionRelativeToSliceStart / divisionData.targetSizesPixels[sliceIndex];
 
         // How many unscaled pixels the unscaled position is beyond the start of the unscaled containing slice.
         int unscaledPositionRelativeToSliceStart = (int) (slices[sliceIndex].size * positionRelativeToSliceNormalised);

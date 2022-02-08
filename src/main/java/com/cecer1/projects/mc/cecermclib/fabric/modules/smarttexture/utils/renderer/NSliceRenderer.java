@@ -31,11 +31,11 @@ public class NSliceRenderer implements IScalableRenderer {
         int targetY = 0;
 
 
-        for (int row = 0; row < rowHeights.sizesPixels.length; row++) {
+        for (int row = 0; row < rowHeights.targetSizesPixels.length; row++) {
             srcX = 0.0f;
             targetX = 0;
 
-            for (int column = 0; column < columnWidths.sizesPixels.length; column++) {
+            for (int column = 0; column < columnWidths.targetSizesPixels.length; column++) {
                 this.drawSlice(
                         matrixStack,
                         
@@ -60,11 +60,11 @@ public class NSliceRenderer implements IScalableRenderer {
                         // Alpha value
                         alpha);
 
-                srcX += columnWidths.sizesNormalized[column];
-                targetX += columnWidths.sizesPixels[column];
+                srcX += columnWidths.sourceSizesNormalized[column];
+                targetX += columnWidths.targetSizesPixels[column];
             }
-            srcY += rowHeights.sizesNormalized[row];
-            targetY += rowHeights.sizesPixels[row];
+            srcY += rowHeights.sourceSizesNormalized[row];
+            targetY += rowHeights.targetSizesPixels[row];
         }
     }
 
@@ -81,86 +81,46 @@ public class NSliceRenderer implements IScalableRenderer {
 
         int x = targetX;
         int y = targetY;
-        int x2 = x + columnWidths.sizesPixels[columnIndex];
-        int y2 = y + rowHeights.sizesPixels[rowIndex];
+        int x2 = x + columnMetadata.size;
+        int y2 = y + rowMetadata.size;
 
         float u = srcX;
         float v = srcY;
-        float u2 = u + columnWidths.sizesNormalized[columnIndex];
-        float v2 = v + rowHeights.sizesNormalized[rowIndex];
+        float u2 = u + columnWidths.sourceSizesNormalized[columnIndex];
+        float v2 = v + rowHeights.sourceSizesNormalized[rowIndex];
 
         switch (columnMetadata.growBehaviour) {
-            case NONE: {
-                if (columnWidths.sizesPixels[columnIndex] > columnMetadata.size) {
-                    // If this code is reached then the target size is larger than the column configuration.
-                    // In order to ensure the texture is drawn exactly as in the texture (which is the whole point of NONE), we
-                    //   recalculate u2 and x2 as if the source and target sizes were set to the same value as the column configuration.
-                    // Essentially we perform a Math.min on the source and target widths to ensure they are not larger than the configuration.
-                    u2 = u + columnWidths.sizesNormalized[columnIndex];
-                    x2 = x + columnMetadata.size;
+            case NONE -> {
+                if (columnWidths.targetSizesPixels[columnIndex] < columnMetadata.size) {
+                    // If the target size is smaller than the source size then we crop the source size so that it fits
+                    u2 *= ((float) columnWidths.targetSizesPixels[columnIndex] / columnMetadata.size);
                 }
-                break;
             }
-            case REPEAT: {
-                // TODO: Use GL_REPEAT which'll require splitting textures or simply draw multiple times.
-                // GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
-                throw new UnsupportedOperationException("Not implemented yet!");
+            // TODO: Use GL_REPEAT which'll require splitting textures or simply draw multiple times.
+            // GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
+            case REPEAT -> throw new UnsupportedOperationException("Not implemented yet!");
+            case STRETCH -> {
+                x2 = x + columnWidths.targetSizesPixels[columnIndex];
             }
-            case STRETCH: {
-                if (columnWidths.sizesPixels[columnIndex] > columnMetadata.size) {
-                    // If this code is reached then the target size is larger than the column configuration.
-                    // In order to ensure that only the pixels from this column's area of the texture are drawn, we
-                    //   recalculate u2 as if the source and target sizes were set to the same value as the column configuration.
-                    // Essentially we perform a Math.min on the source width to ensure it is not larger than the configuration.
-                    //
-                    // This differs from NONE in that we do not change the target width. This causes the source texture
-                    //   to be stretched out over a larger target area.
-
-                    u2 = u + columnWidths.sizesNormalized[columnIndex];
-                }
-                break;
-            }
-            default: {
-                throw new IllegalArgumentException("Unknown column GrowBehaviour: " + columnMetadata.growBehaviour);
-            }
+            default -> throw new IllegalArgumentException("Unknown column GrowBehaviour: " + columnMetadata.growBehaviour);
         }
 
         switch (rowMetadata.growBehaviour) {
-            case NONE: {
-                if (rowHeights.sizesPixels[rowIndex] > rowMetadata.size) {
-                    // If this code is reached then the target size is larger than the row configuration.
-                    // In order to ensure the texture is drawn exactly as in the texture (which is the whole point of NONE), we
-                    //   recalculate v2 and y2 as if the source and target sizes were set to the same value as the row configuration.
-                    // Essentially we perform a Math.min on the source and target height to ensure they are not larger than the configuration.
-                    v2 = v + rowHeights.sizesNormalized[rowIndex];
-                    y2 = y + rowMetadata.size;
+            case NONE -> {
+                if (rowHeights.targetSizesPixels[rowIndex] < rowMetadata.size) {
+                    // If the target size is smaller than the source size then we crop the source size so that it fits
+                    v2 *= ((float) rowHeights.targetSizesPixels[rowIndex] / rowMetadata.size);
                 }
-                break;
             }
-            case REPEAT: {
-                // TODO: Use GL_REPEAT which may require splitting textures or simply draw multiple times.
-                // GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
-                throw new UnsupportedOperationException("Not implemented yet!");
+            // TODO: Use GL_REPEAT which may require splitting textures or simply draw multiple times.
+            // GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
+            case REPEAT -> throw new UnsupportedOperationException("Not implemented yet!");
+            case STRETCH -> {
+                y2 = y + rowHeights.targetSizesPixels[rowIndex];
             }
-            case STRETCH: {
-                if (rowHeights.sizesPixels[rowIndex] > rowMetadata.size) {
-                    // If this code is reached then the target size is larger than the row configuration.
-                    // In order to ensure that only the pixels from this row's area of the texture are drawn, we
-                    //   recalculate v2 as if the source and target sizes were set to the same value as the row configuration.
-                    // Essentially we perform a Math.min on the source height to ensure it is not larger than the configuration.
-                    //
-                    // This differs from NONE in that we do not change the target height. This causes the source texture
-                    //   to be stretched out over a larger target area.
-
-                    v2 = v + rowHeights.sizesNormalized[rowIndex];
-                }
-                break;
-            }
-            default: {
-                throw new IllegalArgumentException("Unknown row GrowBehaviour: " + rowMetadata.growBehaviour);
-            }
+            default -> throw new IllegalArgumentException("Unknown row GrowBehaviour: " + rowMetadata.growBehaviour);
         }
-
+        
         // GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST); // From 1.8.9
         texture.bindTexture();
         Matrix4f matrix = matrixStack.peek().getPositionMatrix();
