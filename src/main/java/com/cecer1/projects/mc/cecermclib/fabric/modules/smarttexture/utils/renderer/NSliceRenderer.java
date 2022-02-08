@@ -1,12 +1,10 @@
 package com.cecer1.projects.mc.cecermclib.fabric.modules.smarttexture.utils.renderer;
 
+import com.cecer1.projects.mc.cecermclib.fabric.modules.rendering.DrawMethods;
 import com.cecer1.projects.mc.cecermclib.fabric.modules.smarttexture.nslice.NSliceResourceMetadata;
 import com.cecer1.projects.mc.cecermclib.fabric.modules.smarttexture.utils.rescaler.ScaledDivisionData;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.render.*;
 import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Matrix4f;
 
 public class NSliceRenderer implements IScalableRenderer {
     private final NSliceResourceMetadata metadata;
@@ -79,29 +77,23 @@ public class NSliceRenderer implements IScalableRenderer {
             float alpha) {
 
 
-        int x = targetX;
-        int y = targetY;
-        int x2 = x + columnMetadata.size;
-        int y2 = y + rowMetadata.size;
-
-        float u = srcX;
-        float v = srcY;
-        float u2 = u + columnWidths.sourceSizesNormalized[columnIndex];
-        float v2 = v + rowHeights.sourceSizesNormalized[rowIndex];
+        int targetWidth = columnMetadata.size;
+        int targetHeight = rowMetadata.size;
+        
+        float srcHeight = columnWidths.sourceSizesNormalized[columnIndex];
+        float srcWidth = rowHeights.sourceSizesNormalized[rowIndex];
 
         switch (columnMetadata.growBehaviour) {
             case NONE -> {
                 if (columnWidths.targetSizesPixels[columnIndex] < columnMetadata.size) {
                     // If the target size is smaller than the source size then we crop the source size so that it fits
-                    u2 *= ((float) columnWidths.targetSizesPixels[columnIndex] / columnMetadata.size);
+                    srcHeight *= ((float) columnWidths.targetSizesPixels[columnIndex] / columnMetadata.size);
                 }
             }
             // TODO: Use GL_REPEAT which'll require splitting textures or simply draw multiple times.
             // GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
             case REPEAT -> throw new UnsupportedOperationException("Not implemented yet!");
-            case STRETCH -> {
-                x2 = x + columnWidths.targetSizesPixels[columnIndex];
-            }
+            case STRETCH -> targetWidth = columnWidths.targetSizesPixels[columnIndex];
             default -> throw new IllegalArgumentException("Unknown column GrowBehaviour: " + columnMetadata.growBehaviour);
         }
 
@@ -109,29 +101,22 @@ public class NSliceRenderer implements IScalableRenderer {
             case NONE -> {
                 if (rowHeights.targetSizesPixels[rowIndex] < rowMetadata.size) {
                     // If the target size is smaller than the source size then we crop the source size so that it fits
-                    v2 *= ((float) rowHeights.targetSizesPixels[rowIndex] / rowMetadata.size);
+                    srcWidth *= ((float) rowHeights.targetSizesPixels[rowIndex] / rowMetadata.size);
                 }
             }
             // TODO: Use GL_REPEAT which may require splitting textures or simply draw multiple times.
             // GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
             case REPEAT -> throw new UnsupportedOperationException("Not implemented yet!");
-            case STRETCH -> {
-                y2 = y + rowHeights.targetSizesPixels[rowIndex];
-            }
+            case STRETCH -> targetHeight = rowHeights.targetSizesPixels[rowIndex];
             default -> throw new IllegalArgumentException("Unknown row GrowBehaviour: " + rowMetadata.growBehaviour);
         }
+
+        DrawMethods.drawColoredTexturedQuad(matrixStack, texture,
+                targetX, targetY,
+                targetWidth, targetHeight,
+                srcX, srcY,
+                srcWidth, srcHeight,
+                ~(~((int)alpha * 255) << 24)); // To ARGB with RGB all being 1
         
-        // GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST); // From 1.8.9
-        texture.bindTexture();
-        Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-        bufferBuilder.vertex(matrix, x, y2, 0).texture(u, v2).color(1.0f, 1.0f, 1.0f, alpha).next();
-        bufferBuilder.vertex(matrix, x2, y2, 0).texture(u2, v2).color(1.0f, 1.0f, 1.0f, alpha).next();
-        bufferBuilder.vertex(matrix, x2, y, 0).texture(u2, v).color(1.0f, 1.0f, 1.0f, alpha).next();
-        bufferBuilder.vertex(matrix, x, y, 0).texture(u, v).color(1.0f, 1.0f, 1.0f, alpha).next();
-        bufferBuilder.end();
-        BufferRenderer.draw(bufferBuilder);
     }
 }

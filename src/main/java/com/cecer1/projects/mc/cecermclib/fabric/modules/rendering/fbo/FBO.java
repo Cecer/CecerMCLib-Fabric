@@ -1,5 +1,6 @@
 package com.cecer1.projects.mc.cecermclib.fabric.modules.rendering.fbo;
 
+import com.cecer1.projects.mc.cecermclib.fabric.modules.rendering.DrawMethods;
 import com.cecer1.projects.mc.cecermclib.fabric.modules.rendering.context.RenderContext;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.*;
@@ -104,6 +105,14 @@ public class FBO {
 		int y = atY;
 		int y2 = atY + height;
 
+		DrawMethods.drawColoredTexturedQuad(matrixStack, resources.getTextureId(), 
+				atX, atY,
+				width, height,
+				0, 0,
+				1, 1,
+				~(~((int)alpha * 255) << 24));
+		
+
 		RenderSystem.setShaderTexture(0, this.resources.getTextureId());
 		RenderSystem.setShaderColor(1f, 1f, 1f, alpha);
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
@@ -116,20 +125,6 @@ public class FBO {
 		bufferBuilder.vertex(matrix, (float)x, (float)y, 0f).texture(0f, 1f).next();
 		bufferBuilder.end();
 		BufferRenderer.draw(bufferBuilder);
-
-//		this.resources.getTexture().bindTexture();
-//
-//		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-//		BufferBuilder bufferBuilder = tessellator.getBuffer();
-//		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-//		bufferBuilder.vertex(x, y2, 0).texture(0, 0).color(1f, 1f, 1f, alpha);
-//		bufferBuilder.vertex(x2, y2, 0).texture(1, 0).color(1f, 1f, 1f, alpha);
-//		bufferBuilder.vertex(x2, y, 0).texture(1, 1).color(1f, 1f, 1f, alpha);
-//		bufferBuilder.vertex(x, y, 0).texture(0, 1).color(1f, 1f, 1f, alpha);
-//		bufferBuilder.end();
-//		tessellator.draw(); // Old style (1)
-//		BufferRenderer.draw(bufferBuilder); // New style A (2)
-//		BufferRenderer.postDraw(bufferBuilder); // New style B (3) (Might need a bunch of other work to make it work)
 	}
 
 	public boolean isReady() {
