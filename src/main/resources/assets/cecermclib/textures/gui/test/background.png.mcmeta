@@ -1,0 +1,24 @@
+{
+  "cecermclib_nslice": {
+    "formatVersion": 1,
+    "rows": [
+      {
+        "size": 1,
+        "growBehaviour": "STRETCH",
+        "growWeight": 1
+      },
+      {
+        "size": 3,
+        "growBehaviour": "NONE",
+        "growWeight": 0
+      }
+    ],
+    "columns": [
+      {
+        "size": 3,
+        "growBehaviour": "STRETCH",
+        "growWeight": 1
+      }
+    ]
+  }
+}
