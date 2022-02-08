@@ -80,14 +80,14 @@ public class NSliceRenderer implements IScalableRenderer {
         int targetWidth = columnMetadata.size;
         int targetHeight = rowMetadata.size;
         
-        float srcHeight = columnWidths.sourceSizesNormalized[columnIndex];
-        float srcWidth = rowHeights.sourceSizesNormalized[rowIndex];
+        float srcHeight = rowHeights.sourceSizesNormalized[rowIndex];
+        float srcWidth = columnWidths.sourceSizesNormalized[columnIndex];
 
         switch (columnMetadata.growBehaviour) {
             case NONE -> {
                 if (columnWidths.targetSizesPixels[columnIndex] < columnMetadata.size) {
                     // If the target size is smaller than the source size then we crop the source size so that it fits
-                    srcHeight *= ((float) columnWidths.targetSizesPixels[columnIndex] / columnMetadata.size);
+                    srcWidth *= ((float) columnWidths.targetSizesPixels[columnIndex] / columnMetadata.size);
                 }
             }
             // TODO: Use GL_REPEAT which'll require splitting textures or simply draw multiple times.
@@ -101,7 +101,7 @@ public class NSliceRenderer implements IScalableRenderer {
             case NONE -> {
                 if (rowHeights.targetSizesPixels[rowIndex] < rowMetadata.size) {
                     // If the target size is smaller than the source size then we crop the source size so that it fits
-                    srcWidth *= ((float) rowHeights.targetSizesPixels[rowIndex] / rowMetadata.size);
+                    srcHeight *= ((float) rowHeights.targetSizesPixels[rowIndex] / rowMetadata.size);
                 }
             }
             // TODO: Use GL_REPEAT which may require splitting textures or simply draw multiple times.
