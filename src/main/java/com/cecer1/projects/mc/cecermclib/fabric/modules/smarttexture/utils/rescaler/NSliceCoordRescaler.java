@@ -10,22 +10,22 @@ public class NSliceCoordRescaler implements ICoordRescaler {
     }
 
     @Override
-    public int scaleX(int x, int fullWidth, int fullHeight) {
+    public int scaleX(int x, int fullWidth) {
         return this.scalePosition(x, fullWidth, this.metadata.getColumns());
     }
 
     @Override
-    public int scaleY(int y, int fullWidth, int fullHeight) {
+    public int scaleY(int y, int fullHeight) {
         return this.scalePosition(y, fullHeight, this.metadata.getRows());
     }
 
     @Override
-    public int unscaleX(int x, int fullWidth, int fullHeight) {
+    public int unscaleX(int x, int fullWidth) {
         return this.unscalePosition(x, fullWidth, this.metadata.getColumns());
     }
 
     @Override
-    public int unscaleY(int y, int fullWidth, int fullHeight) {
+    public int unscaleY(int y, int fullHeight) {
         return this.unscalePosition(y, fullHeight, this.metadata.getRows());
     }
     

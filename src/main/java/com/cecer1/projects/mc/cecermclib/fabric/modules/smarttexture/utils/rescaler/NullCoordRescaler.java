@@ -7,20 +7,20 @@ public class NullCoordRescaler implements ICoordRescaler {
     private NullCoordRescaler() {}
 
     @Override
-    public int scaleX(int x, int fullWidth, int fullHeight) {
+    public int scaleX(int x, int fullWidth) {
         return x;
     }
     @Override
-    public int scaleY(int y, int fullWidth, int fullHeight) {
+    public int scaleY(int y, int fullHeight) {
         return y;
     }
 
     @Override
-    public int unscaleX(int x, int fullWidth, int fullHeight) {
+    public int unscaleX(int x, int fullWidth) {
         return x;
     }
     @Override
-    public int unscaleY(int y, int fullWidth, int fullHeight) {
+    public int unscaleY(int y, int fullHeight) {
         return y;
     }
 }

@@ -27,7 +27,10 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -49,8 +52,8 @@ public class SmartTexture {
     private IScalableRenderer renderer;
     private ICoordRescaler coordRescaler;
     
-    private final int minWidth;
-    private final int minHeight;
+    private final int textureWidth;
+    private final int textureHeight;
 
     public static SmartTexture fromIdentifier(Identifier identifier) {
         try {
@@ -64,6 +67,20 @@ public class SmartTexture {
 
         Resource resource = SmartTexture.resourceManager.getResource(textureIdentifier);
         try {
+            int textureWidth, textureHeight;
+            try(InputStream inputStream = resourceManager.getResource(textureIdentifier).getInputStream()) {
+                BufferedImage image = ImageIO.read(inputStream);
+                textureWidth = image.getWidth();
+                textureHeight = image.getHeight();
+            } catch (IOException e) {
+                CecerMCLib.get(LoggerModule.class).getChannel(SmartTexture.class).log("Failed to read texture dimensions for %s. This may cause graphic errors or even crashes.", textureIdentifier);
+                e.printStackTrace();
+                textureWidth = 0;
+                textureHeight = 0;
+            }
+            this.textureWidth = textureWidth;
+            this.textureHeight = textureHeight;
+            
             this.nsliceMetadata = resource.getMetadata(NSliceResourceMetadataReader.getInstance());
             this.slotsMetadata = resource.getMetadata(SlotsResourceMetadataReader.getInstance());
             this.tagsMetadata = resource.getMetadata(TagResourceMetadataReader.getInstance());
@@ -88,21 +105,17 @@ public class SmartTexture {
             this.renderer = SimpleRenderer.INSTANCE;
             this.coordRescaler = NullCoordRescaler.INSTANCE;
         }
-
-        int inc = 0;
-        for (NSliceResourceMetadata.Slice slice : this.nsliceMetadata.getColumns()) {
-            inc += slice.size;
-        }
-        this.minWidth = inc;
-        inc = 0;
-        for (NSliceResourceMetadata.Slice slice : this.nsliceMetadata.getRows()) {
-            inc += slice.size;
-        }
-        this.minHeight = inc;
     }
     
     private AbstractTexture getTexture() {
         return SmartTexture.textureManager.getTexture(this.textureIdentifier);
+    }
+
+    public int getTextureWidth() {
+        return this.textureWidth;
+    }
+    public int getTextureHeight() {
+        return this.textureHeight;
     }
 
     public void draw(MatrixStack matrixStack, int targetWidth, int targetHeight) {
@@ -111,20 +124,22 @@ public class SmartTexture {
     public TransformCanvas selectSlot(@NotNull String name, RenderContext ctx) {
         return this.selectSlot(name, ctx.getCanvas().getWidth(), ctx.getCanvas().getHeight(), ctx);
     }
-    public TransformCanvas selectSlot(@NotNull String name, int totalWidth, int totalHeight, RenderContext ctx) {
+    
+    private TransformCanvas selectSlot(@NotNull String name, int totalWidth, int totalHeight, RenderContext ctx) {
         if (this.slotsMetadata == null) {
             // No slot metadata, do nothing.
             return ctx.getCanvas().transform().openTransformation();
         }
+
+        SlotsResourceMetadata.Slot slot = this.getSlot(name);
         
-        int targetWidth = totalWidth - this.getSlotMarginX(name, totalWidth);
-        int targetHeight = totalWidth - this.getSlotMarginY(name, totalHeight);
+        int slotWidth = this.getTextureWidth() - slot.x;
+        int slotHeight = this.getTextureHeight() - slot.y;
         
-        SlotsResourceMetadata.Slot slot = this.slotsMetadata.getSlot(name);
         return ctx.getCanvas().transform()
                 .translate(
-                        this.coordRescaler.scaleX(slot.x, targetWidth, targetHeight),
-                        this.coordRescaler.scaleY(slot.y, targetWidth, targetHeight))
+                        this.coordRescaler.scaleX(slot.x, slotWidth),
+                        this.coordRescaler.scaleY(slot.y, slotHeight))
                 .absoluteResize(totalWidth, totalHeight)
                 .openTransformation();
     }
@@ -136,36 +151,45 @@ public class SmartTexture {
         }
         
         int color = this.tagMapTexture.get().getPixelColor(
-                this.coordRescaler.scaleX(x, targetWidth, targetHeight),
-                this.coordRescaler.scaleY(y, targetWidth, targetHeight));
+                this.coordRescaler.scaleX(x, targetWidth),
+                this.coordRescaler.scaleY(y, targetHeight));
         
         return this.tagsMetadata.getTags(color);
     }
-
-
-    public int getSlotMarginX(String name) {
-        return this.getSlotMarginX(name, this.minWidth);
-    }
-    public int getSlotMarginY(String name) {
-        return this.getSlotMarginY(name, this.minHeight);
-    }
     
-    public int getSlotMarginX(String name, int totalWidth) {
-        SlotsResourceMetadata.Slot slot = this.slotsMetadata.getSlot(name);
-        return totalWidth - (this.coordRescaler.scaleX(slot.x + slot.width, totalWidth, 1) - this.coordRescaler.scaleX(slot.x, totalWidth, 1));
+    public SlotsResourceMetadata.Slot getSlot(String slotName) {
+        return this.slotsMetadata.getSlot(slotName);
     }
-    public int getSlotMarginY(String name, int totalHeight) {
-        SlotsResourceMetadata.Slot slot = this.slotsMetadata.getSlot(name);
-        return totalHeight - (this.coordRescaler.scaleY(slot.y + slot.height, 1, totalHeight) - this.coordRescaler.scaleY(slot.y, 1, totalHeight));
-    }
-    
 
-    public int getSlotWidth(String name, int totalWidth) {
-        SlotsResourceMetadata.Slot slot = this.slotsMetadata.getSlot(name);
-        return this.coordRescaler.scaleX(slot.x + slot.width, totalWidth, 1) - this.coordRescaler.scaleX(slot.x, totalWidth, 1);
-    }
-    public int getSlotHeight(String name, int totalHeight) {
-        SlotsResourceMetadata.Slot slot = this.slotsMetadata.getSlot(name);
-        return this.coordRescaler.scaleY(slot.y + slot.height, 1, totalHeight) - this.coordRescaler.scaleY(slot.y, 1, totalHeight);
-    }
+//    @Deprecated
+//    public int getSlotMarginX(String name) {
+//        return this.getSlotMarginX(name, this.minWidth);
+//    }
+//    @Deprecated
+//    public int getSlotMarginY(String name) {
+//        return this.getSlotMarginY(name, this.minHeight);
+//    }
+//
+//    @Deprecated
+//    public int getSlotMarginX(String name, int totalWidth) {
+//        SlotsResourceMetadata.Slot slot = this.slotsMetadata.getSlot(name);
+//        return totalWidth - (this.coordRescaler.scaleX(slot.x + slot.width, totalWidth, 1) - this.coordRescaler.scaleX(slot.x, totalWidth, 1));
+//    }
+//    @Deprecated
+//    public int getSlotMarginY(String name, int totalHeight) {
+//        SlotsResourceMetadata.Slot slot = this.slotsMetadata.getSlot(name);
+//        return totalHeight - (this.coordRescaler.scaleY(slot.y + slot.height, 1, totalHeight) - this.coordRescaler.scaleY(slot.y, 1, totalHeight));
+//    }
+//
+//
+//    @Deprecated
+//    public int getSlotWidth(String name, int totalWidth) {
+//        SlotsResourceMetadata.Slot slot = this.slotsMetadata.getSlot(name);
+//        return this.coordRescaler.scaleX(slot.x + slot.width, totalWidth, 1) - this.coordRescaler.scaleX(slot.x, totalWidth, 1);
+//    }
+//    @Deprecated
+//    public int getSlotHeight(String name, int totalHeight) {
+//        SlotsResourceMetadata.Slot slot = this.slotsMetadata.getSlot(name);
+//        return this.coordRescaler.scaleY(slot.y + slot.height, 1, totalHeight) - this.coordRescaler.scaleY(slot.y, 1, totalHeight);
+//    }
 }
