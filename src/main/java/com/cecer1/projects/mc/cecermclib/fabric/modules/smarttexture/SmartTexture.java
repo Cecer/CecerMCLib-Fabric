@@ -121,10 +121,11 @@ public class SmartTexture {
     public void draw(MatrixStack matrixStack, int targetWidth, int targetHeight) {
         this.renderer.draw(matrixStack, this.getTexture(), targetWidth, targetHeight);
     }
-    public TransformCanvas selectSlot(@NotNull String name, RenderContext ctx) {
+
+
+    private TransformCanvas selectSlot(@NotNull String name, RenderContext ctx) {
         return this.selectSlot(name, ctx.getCanvas().getWidth(), ctx.getCanvas().getHeight(), ctx);
     }
-    
     private TransformCanvas selectSlot(@NotNull String name, int totalWidth, int totalHeight, RenderContext ctx) {
         if (this.slotsMetadata == null) {
             // No slot metadata, do nothing.
@@ -132,7 +133,12 @@ public class SmartTexture {
         }
 
         SlotsResourceMetadata.Slot slot = this.getSlot(name);
-        
+        return this.selectSlot(slot, totalWidth, totalHeight, ctx);
+    }
+    public TransformCanvas selectSlot(@NotNull SlotsResourceMetadata.Slot slot, RenderContext ctx) {
+        return this.selectSlot(slot, ctx.getCanvas().getWidth(), ctx.getCanvas().getHeight(), ctx);
+    }
+    public TransformCanvas selectSlot(@NotNull SlotsResourceMetadata.Slot slot, int totalWidth, int totalHeight,RenderContext ctx) {
         int slotWidth = this.getTextureWidth() - slot.x;
         int slotHeight = this.getTextureHeight() - slot.y;
         
