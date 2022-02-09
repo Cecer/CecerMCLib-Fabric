@@ -1,6 +1,7 @@
 package com.cecer1.projects.mc.cecermclib.fabric.modules.smarttexture.utils.rescaler;
 
 import com.cecer1.projects.mc.cecermclib.fabric.modules.smarttexture.nslice.NSliceResourceMetadata;
+import com.cecer1.projects.mc.cecermclib.fabric.modules.smarttexture.nslice.NSliceSlice;
 
 public class NSliceCoordRescaler implements ICoordRescaler {
     private final NSliceResourceMetadata metadata;
@@ -31,7 +32,7 @@ public class NSliceCoordRescaler implements ICoordRescaler {
     
 
     // This method is verbose for clarity.
-    private int scalePosition(int unscaledPosition, int scaledSize, NSliceResourceMetadata.Slice[] slices) {
+    private int scalePosition(int unscaledPosition, int scaledSize, NSliceSlice[] slices) {
         ScaledDivisionData divisionData = ScaledDivisionData.calculate(scaledSize, slices);
 
         // This WILL hold the unscaled number of pixels that are before the slice containing our position.
@@ -42,11 +43,11 @@ public class NSliceCoordRescaler implements ICoordRescaler {
         // This WILL hold the slice index containing our position.
         int sliceIndex = 0;
         for (; sliceIndex < slices.length; sliceIndex++) {
-            if (unscaledPixelsBeforeSlice + slices[sliceIndex].size > unscaledPosition) {
+            if (unscaledPixelsBeforeSlice + slices[sliceIndex].size() > unscaledPosition) {
                 // We have reached the slice containing the position. Break out of the loop!
                 break;
             }
-            unscaledPixelsBeforeSlice += slices[sliceIndex].size;
+            unscaledPixelsBeforeSlice += slices[sliceIndex].size();
             scaledPixelsBeforeSlice += divisionData.targetSizesPixels[sliceIndex];
         }
         // unscaledPixelsBeforeSlice, scaledPixelsBeforeSlice and sliceIndex now contain their final values.
@@ -55,7 +56,7 @@ public class NSliceCoordRescaler implements ICoordRescaler {
         int unscaledPositionRelativeToSliceStart = unscaledPosition - unscaledPixelsBeforeSlice;
         
         // The percentage (0-1) of the containing slice that is before the position.
-        double positionRelativeToSliceNormalised = (double) unscaledPositionRelativeToSliceStart / slices[sliceIndex].size;
+        double positionRelativeToSliceNormalised = (double) unscaledPositionRelativeToSliceStart / slices[sliceIndex].size();
         
         // How many scaled pixels the scaled position is beyond the start of the scaled containing slice.
         int scaledPositionRelativeToSliceStart = (int) (divisionData.targetSizesPixels[sliceIndex] * positionRelativeToSliceNormalised);
@@ -65,7 +66,7 @@ public class NSliceCoordRescaler implements ICoordRescaler {
     }
     
     // This method is verbose for clarity.
-    private int unscalePosition(int scaledPosition, int scaledSize, NSliceResourceMetadata.Slice[] slices) {
+    private int unscalePosition(int scaledPosition, int scaledSize, NSliceSlice[] slices) {
         ScaledDivisionData divisionData = ScaledDivisionData.calculate(scaledSize, slices);
 
         // This WILL hold the unscaled number of pixels that are before the slice containing our position.
@@ -80,7 +81,7 @@ public class NSliceCoordRescaler implements ICoordRescaler {
                 // We have reached the slice containing the position. Break out of the loop!
                 break;
             }
-            unscaledPixelsBeforeSlice += slices[sliceIndex].size;
+            unscaledPixelsBeforeSlice += slices[sliceIndex].size();
             scaledPixelsBeforeSlice += divisionData.targetSizesPixels[sliceIndex];
         }
         // unscaledPixelsBeforeSlice, scaledPixelsBeforeSlice and sliceIndex now contain their final values.
@@ -92,7 +93,7 @@ public class NSliceCoordRescaler implements ICoordRescaler {
         double positionRelativeToSliceNormalised = (double) scaledPositionRelativeToSliceStart / divisionData.targetSizesPixels[sliceIndex];
 
         // How many unscaled pixels the unscaled position is beyond the start of the unscaled containing slice.
-        int unscaledPositionRelativeToSliceStart = (int) (slices[sliceIndex].size * positionRelativeToSliceNormalised);
+        int unscaledPositionRelativeToSliceStart = (int) (slices[sliceIndex].size() * positionRelativeToSliceNormalised);
 
         // Add the scaled slice pixels before the position to the scaled pixels before the slice entirely... and we're done!
         return unscaledPixelsBeforeSlice + unscaledPositionRelativeToSliceStart;

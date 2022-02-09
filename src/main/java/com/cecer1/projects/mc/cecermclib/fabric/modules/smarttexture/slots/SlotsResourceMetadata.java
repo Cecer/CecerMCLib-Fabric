@@ -33,34 +33,4 @@ public class SlotsResourceMetadata {
     }
     // </editor-fold>
 
-    public static class Slot {
-        public final int x;
-        public final int y;
-        public final int width;
-        public final int height;
-
-        public Slot(int x, int y, int width, int height) {
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
-        }
-
-        // <editor-fold desc="[Equality]">
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Slot slot = (Slot) o;
-            return x == slot.x &&
-                    y == slot.y &&
-                    width == slot.width &&
-                    height == slot.height;
-        }
-        @Override
-        public int hashCode() {
-            return Objects.hash(x, y, width, height);
-        }
-        // </editor-fold>
-    }
 }

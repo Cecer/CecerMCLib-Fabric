@@ -37,8 +37,8 @@ public class NSliceResourceMetadataReader implements ResourceMetadataReader<NSli
             throw new JsonParseException("Invalid n-slice metadata! columns must be a JSON array of at least 1 slice specification");
         }
 
-        NSliceResourceMetadata.Slice[] rows = new NSliceResourceMetadata.Slice[rowsJson.size()];
-        NSliceResourceMetadata.Slice[] columns = new NSliceResourceMetadata.Slice[columnsJson.size()];
+        NSliceSlice[] rows = new NSliceSlice[rowsJson.size()];
+        NSliceSlice[] columns = new NSliceSlice[columnsJson.size()];
 
         for (int i = 0; i < rows.length; i++) {
             rows[i] = this.deserializeSlice(rowsJson.get(i), i);
@@ -50,7 +50,7 @@ public class NSliceResourceMetadataReader implements ResourceMetadataReader<NSli
         return new NSliceResourceMetadata(rows, columns);
     }
 
-    private NSliceResourceMetadata.Slice deserializeSlice(JsonElement rowElement, int index) throws JsonParseException {
+    private NSliceSlice deserializeSlice(JsonElement rowElement, int index) throws JsonParseException {
         if (!rowElement.isJsonObject()) {
             throw new JsonParseException("Invalid n-slice metadata! rows[" + index + "] is not a valid slice specification");
         }
@@ -60,7 +60,7 @@ public class NSliceResourceMetadataReader implements ResourceMetadataReader<NSli
         String growBehaviourStr = JsonHelper.getString(rowObject, "growBehaviour");
         int growWeight = JsonHelper.getInt(rowObject, "growWeight");
 
-        NSliceResourceMetadata.Slice.GrowBehaviour growBehaviour = NSliceResourceMetadata.Slice.GrowBehaviour.valueOf(growBehaviourStr);
-        return new NSliceResourceMetadata.Slice(size, growBehaviour, growWeight);
+        NSliceGrowBehaviour growBehaviour = NSliceGrowBehaviour.valueOf(growBehaviourStr);
+        return new NSliceSlice(size, growBehaviour, growWeight);
     }
 }

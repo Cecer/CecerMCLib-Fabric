@@ -2,6 +2,7 @@ package com.cecer1.projects.mc.cecermclib.fabric.modules.smarttexture.utils.rend
 
 import com.cecer1.projects.mc.cecermclib.fabric.modules.rendering.DrawMethods;
 import com.cecer1.projects.mc.cecermclib.fabric.modules.smarttexture.nslice.NSliceResourceMetadata;
+import com.cecer1.projects.mc.cecermclib.fabric.modules.smarttexture.nslice.NSliceSlice;
 import com.cecer1.projects.mc.cecermclib.fabric.modules.smarttexture.utils.rescaler.ScaledDivisionData;
 import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.util.math.MatrixStack;
@@ -73,42 +74,42 @@ public class NSliceRenderer implements IScalableRenderer {
             int targetX, int targetY,
             int columnIndex, int rowIndex,
             ScaledDivisionData columnWidths, ScaledDivisionData rowHeights,
-            NSliceResourceMetadata.Slice columnMetadata, NSliceResourceMetadata.Slice rowMetadata,
+            NSliceSlice columnMetadata, NSliceSlice rowMetadata,
             float alpha) {
 
 
-        int targetWidth = columnMetadata.size;
-        int targetHeight = rowMetadata.size;
+        int targetWidth = columnMetadata.size();
+        int targetHeight = rowMetadata.size();
         
         float srcHeight = rowHeights.sourceSizesNormalized[rowIndex];
         float srcWidth = columnWidths.sourceSizesNormalized[columnIndex];
 
-        switch (columnMetadata.growBehaviour) {
+        switch (columnMetadata.growBehaviour()) {
             case NONE -> {
-                if (columnWidths.targetSizesPixels[columnIndex] < columnMetadata.size) {
+                if (columnWidths.targetSizesPixels[columnIndex] < columnMetadata.size()) {
                     // If the target size is smaller than the source size then we crop the source size so that it fits
-                    srcWidth *= ((float) columnWidths.targetSizesPixels[columnIndex] / columnMetadata.size);
+                    srcWidth *= ((float) columnWidths.targetSizesPixels[columnIndex] / columnMetadata.size());
                 }
             }
             // TODO: Use GL_REPEAT which'll require splitting textures or simply draw multiple times.
             // GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
             case REPEAT -> throw new UnsupportedOperationException("Not implemented yet!");
             case STRETCH -> targetWidth = columnWidths.targetSizesPixels[columnIndex];
-            default -> throw new IllegalArgumentException("Unknown column GrowBehaviour: " + columnMetadata.growBehaviour);
+            default -> throw new IllegalArgumentException("Unknown column GrowBehaviour: " + columnMetadata.growBehaviour());
         }
 
-        switch (rowMetadata.growBehaviour) {
+        switch (rowMetadata.growBehaviour()) {
             case NONE -> {
-                if (rowHeights.targetSizesPixels[rowIndex] < rowMetadata.size) {
+                if (rowHeights.targetSizesPixels[rowIndex] < rowMetadata.size()) {
                     // If the target size is smaller than the source size then we crop the source size so that it fits
-                    srcHeight *= ((float) rowHeights.targetSizesPixels[rowIndex] / rowMetadata.size);
+                    srcHeight *= ((float) rowHeights.targetSizesPixels[rowIndex] / rowMetadata.size());
                 }
             }
             // TODO: Use GL_REPEAT which may require splitting textures or simply draw multiple times.
             // GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
             case REPEAT -> throw new UnsupportedOperationException("Not implemented yet!");
             case STRETCH -> targetHeight = rowHeights.targetSizesPixels[rowIndex];
-            default -> throw new IllegalArgumentException("Unknown row GrowBehaviour: " + rowMetadata.growBehaviour);
+            default -> throw new IllegalArgumentException("Unknown row GrowBehaviour: " + rowMetadata.growBehaviour());
         }
 
         DrawMethods.drawColoredTexturedQuad(matrixStack, texture,

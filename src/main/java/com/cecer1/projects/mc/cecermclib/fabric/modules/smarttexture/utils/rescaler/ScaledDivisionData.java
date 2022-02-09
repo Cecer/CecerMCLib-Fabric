@@ -1,6 +1,6 @@
 package com.cecer1.projects.mc.cecermclib.fabric.modules.smarttexture.utils.rescaler;
 
-import com.cecer1.projects.mc.cecermclib.fabric.modules.smarttexture.nslice.NSliceResourceMetadata;
+import com.cecer1.projects.mc.cecermclib.fabric.modules.smarttexture.nslice.NSliceSlice;
 
 public class ScaledDivisionData {
     public final int[] targetSizesPixels;
@@ -13,12 +13,12 @@ public class ScaledDivisionData {
         this.sourceSizesNormalized = sourceSizesNormalized;
     }
 
-    public static ScaledDivisionData calculate(int fullSize, NSliceResourceMetadata.Slice[] slices) {
+    public static ScaledDivisionData calculate(int fullSize, NSliceSlice[] slices) {
         int baseSize = 0;
         int growSum = 0;
-        for (NSliceResourceMetadata.Slice slice : slices) {
-            baseSize += slice.size;
-            growSum += slice.growWeight;
+        for (NSliceSlice slice : slices) {
+            baseSize += slice.size();
+            growSum += slice.growWeight();
         }
         
         int growNeeded = fullSize - baseSize;
@@ -31,9 +31,9 @@ public class ScaledDivisionData {
         float[] sizesNormalized = new float[slices.length];
         float[] sourceSizesNormalized = new float[slices.length];
         for (int i = 0; i < slices.length; i++) {
-            sizesPixels[i] = slices[i].size + (int) (slices[i].growWeight * growWeightUnit);
+            sizesPixels[i] = slices[i].size() + (int) (slices[i].growWeight() * growWeightUnit);
             sizesNormalized[i] = (float) sizesPixels[i] / fullSize;
-            sourceSizesNormalized[i] = (float) slices[i].size / baseSize;
+            sourceSizesNormalized[i] = (float) slices[i].size() / baseSize;
         }
         return new ScaledDivisionData(sizesPixels, sizesNormalized, sourceSizesNormalized);
     }

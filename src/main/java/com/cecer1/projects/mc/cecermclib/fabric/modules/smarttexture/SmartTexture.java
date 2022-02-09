@@ -6,6 +6,7 @@ import com.cecer1.projects.mc.cecermclib.fabric.modules.rendering.context.Render
 import com.cecer1.projects.mc.cecermclib.fabric.modules.rendering.context.TransformCanvas;
 import com.cecer1.projects.mc.cecermclib.fabric.modules.smarttexture.nslice.NSliceResourceMetadata;
 import com.cecer1.projects.mc.cecermclib.fabric.modules.smarttexture.nslice.NSliceResourceMetadataReader;
+import com.cecer1.projects.mc.cecermclib.fabric.modules.smarttexture.slots.Slot;
 import com.cecer1.projects.mc.cecermclib.fabric.modules.smarttexture.slots.SlotsResourceMetadata;
 import com.cecer1.projects.mc.cecermclib.fabric.modules.smarttexture.slots.SlotsResourceMetadataReader;
 import com.cecer1.projects.mc.cecermclib.fabric.modules.smarttexture.tags.TagMapTexture;
@@ -25,6 +26,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
@@ -49,8 +51,8 @@ public class SmartTexture {
     
     private final Supplier<TagMapTexture> tagMapTexture;
     
-    private IScalableRenderer renderer;
-    private ICoordRescaler coordRescaler;
+    private final IScalableRenderer renderer;
+    private final ICoordRescaler coordRescaler;
     
     private final int textureWidth;
     private final int textureHeight;
@@ -127,25 +129,27 @@ public class SmartTexture {
         return this.selectSlot(name, ctx.getCanvas().getWidth(), ctx.getCanvas().getHeight(), ctx);
     }
     private TransformCanvas selectSlot(@NotNull String name, int totalWidth, int totalHeight, RenderContext ctx) {
-        if (this.slotsMetadata == null) {
-            // No slot metadata, do nothing.
-            return ctx.getCanvas().transform().openTransformation();
+        if (this.slotsMetadata != null) {
+            Slot slot = this.getSlot(name);
+            if (slot != null) {
+                return this.selectSlot(slot, totalWidth, totalHeight, ctx);
+            }
         }
 
-        SlotsResourceMetadata.Slot slot = this.getSlot(name);
-        return this.selectSlot(slot, totalWidth, totalHeight, ctx);
+        // No slot metadata or no slot, do nothing.
+        return ctx.getCanvas().transform().openTransformation();
     }
-    public TransformCanvas selectSlot(@NotNull SlotsResourceMetadata.Slot slot, RenderContext ctx) {
+    public TransformCanvas selectSlot(@NotNull Slot slot, RenderContext ctx) {
         return this.selectSlot(slot, ctx.getCanvas().getWidth(), ctx.getCanvas().getHeight(), ctx);
     }
-    public TransformCanvas selectSlot(@NotNull SlotsResourceMetadata.Slot slot, int totalWidth, int totalHeight,RenderContext ctx) {
-        int slotWidth = this.getTextureWidth() - slot.x;
-        int slotHeight = this.getTextureHeight() - slot.y;
+    public TransformCanvas selectSlot(@NotNull Slot slot, int totalWidth, int totalHeight, RenderContext ctx) {
+        int slotWidth = this.getTextureWidth() - slot.x();
+        int slotHeight = this.getTextureHeight() - slot.y();
         
         return ctx.getCanvas().transform()
                 .translate(
-                        this.coordRescaler.scaleX(slot.x, slotWidth),
-                        this.coordRescaler.scaleY(slot.y, slotHeight))
+                        this.coordRescaler.scaleX(slot.x(), slotWidth),
+                        this.coordRescaler.scaleY(slot.y(), slotHeight))
                 .absoluteResize(totalWidth, totalHeight)
                 .openTransformation();
     }
@@ -163,7 +167,10 @@ public class SmartTexture {
         return this.tagsMetadata.getTags(color);
     }
     
-    public SlotsResourceMetadata.Slot getSlot(String slotName) {
+    public @Nullable Slot getSlot(String slotName) {
+        if (this.slotsMetadata == null) {
+            return null;
+        }
         return this.slotsMetadata.getSlot(slotName);
     }
 

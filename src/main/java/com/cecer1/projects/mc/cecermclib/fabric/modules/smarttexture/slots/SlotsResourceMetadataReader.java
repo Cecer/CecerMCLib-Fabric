@@ -30,11 +30,11 @@ public class SlotsResourceMetadataReader implements ResourceMetadataReader<Slots
         }
 
         JsonObject slotsJson = obj.getAsJsonObject("slots");
-        Map<String, SlotsResourceMetadata.Slot> slots = new HashMap<>();
+        Map<String, Slot> slots = new HashMap<>();
         
         for (Map.Entry<String, JsonElement> slotEntry : slotsJson.entrySet()) {
             JsonObject slotJson = slotEntry.getValue().getAsJsonObject();
-            slots.put(slotEntry.getKey(), new SlotsResourceMetadata.Slot(
+            slots.put(slotEntry.getKey(), new Slot(
                     JsonHelper.getInt(slotJson, "x"),
                     JsonHelper.getInt(slotJson, "y"),
                     JsonHelper.getInt(slotJson, "width"),
