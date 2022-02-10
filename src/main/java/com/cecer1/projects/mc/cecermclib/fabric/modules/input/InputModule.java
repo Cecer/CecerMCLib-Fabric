@@ -19,6 +19,7 @@ public class InputModule implements IModule {
 
     @Override
     public void onModuleRegister() {
+        AllModulesInitialisedCallback.EVENT.register(this.mouseInputManager::registerEvents);
         AllModulesInitialisedCallback.EVENT.register(this.keyboardInputManager::registerEvents);
     }
 }
