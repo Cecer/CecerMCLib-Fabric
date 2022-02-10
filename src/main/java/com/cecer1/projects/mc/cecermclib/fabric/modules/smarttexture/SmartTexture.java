@@ -126,13 +126,10 @@ public class SmartTexture {
 
 
     private TransformCanvas selectSlot(@NotNull String name, RenderContext ctx) {
-        return this.selectSlot(name, ctx.getCanvas().getWidth(), ctx.getCanvas().getHeight(), ctx);
-    }
-    private TransformCanvas selectSlot(@NotNull String name, int totalWidth, int totalHeight, RenderContext ctx) {
         if (this.slotsMetadata != null) {
             Slot slot = this.getSlot(name);
             if (slot != null) {
-                return this.selectSlot(slot, totalWidth, totalHeight, ctx);
+                return this.selectSlot(slot, ctx);
             }
         }
 
@@ -140,16 +137,13 @@ public class SmartTexture {
         return ctx.getCanvas().transform().openTransformation();
     }
     public TransformCanvas selectSlot(@NotNull Slot slot, RenderContext ctx) {
-        return this.selectSlot(slot, ctx.getCanvas().getWidth(), ctx.getCanvas().getHeight(), ctx);
-    }
-    public TransformCanvas selectSlot(@NotNull Slot slot, int totalWidth, int totalHeight, RenderContext ctx) {
-        int slotWidth = this.getTextureWidth() - slot.x();
-        int slotHeight = this.getTextureHeight() - slot.y();
+        int totalWidth = ctx.getCanvas().getWidth();
+        int totalHeight = ctx.getCanvas().getHeight();
         
         return ctx.getCanvas().transform()
                 .translate(
-                        this.coordRescaler.scaleX(slot.x(), slotWidth),
-                        this.coordRescaler.scaleY(slot.y(), slotHeight))
+                        this.coordRescaler.scaleX(slot.x(), ctx.getCanvas().getWidth()),
+                        this.coordRescaler.scaleY(slot.y(), ctx.getCanvas().getHeight()))
                 .absoluteResize(totalWidth, totalHeight)
                 .openTransformation();
     }
