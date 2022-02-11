@@ -10,6 +10,7 @@ import com.google.gson.JsonParser;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.text.*;
+import net.minecraft.util.Identifier;
 
 import java.util.Collection;
 
@@ -47,7 +48,8 @@ public class FabricTextAdapter implements ITextAdapter<MutableText> {
                 //.withStrikethrough(part.getState().isStrikethrough()) // TODO: This is not implemented! Decide what to do
                 //.withObfuscated(part.getState().isObfuscated()) // TODO: This is not implemented! Decide what to do
                 .withColor(TextColor.parse(part.getState().getColor().getValue()))
-                .withInsertion(part.getState().getInsertion());
+                .withInsertion(part.getState().getInsertion())
+                .withFont(new Identifier(part.getState().getFont()));
         
         if (part.getState().getClick() != Click.NONE) {
             style = style.withClickEvent(this.adaptClick(part.getState().getClick()));
