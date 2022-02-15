@@ -71,7 +71,7 @@ public class RenderingModule implements IModule {
                     final AbstractCanvas canvas = canvases.pop();
                     channel.log("  " + canvas.getClass().getName());
                     StackTraceElement[] trace = canvas.getOpenTrace();
-                    for (int i = 0; i < trace.length; i++) {
+                    for (int i = 2; i < trace.length; i++) {
                         channel.log("    " + trace[i]);
                     }
                 }
