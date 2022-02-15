@@ -12,9 +12,9 @@ import net.minecraft.text.Text;
 
 import java.util.List;
 
-public class WrappedFabricComponent extends WrappedComponent<MutableText> {
+public class WrappedFabricComponent extends WrappedComponent<Text> {
 
-    public WrappedFabricComponent(MutableText component) {
+    public WrappedFabricComponent(Text component) {
         super(component);
     }
     
@@ -61,18 +61,22 @@ public class WrappedFabricComponent extends WrappedComponent<MutableText> {
     }
 
     @Override
-    public void appendChild(MutableText child) {
-        this.getComponent().append(child);
+    public void appendChild(Text child) {
+        if (this.getComponent() instanceof MutableText component) {
+            component.append(child);
+        } else {
+            throw new UnsupportedOperationException("Cannot append to a read only component.");
+        }
     }
 
     @Override
-    public WrappedComponent<MutableText>[] getChildren() {
+    public WrappedComponent<Text>[] getChildren() {
         List<Text> childList = this.getComponent().getSiblings();
         WrappedFabricComponent[] children = new WrappedFabricComponent[childList.size()];
         for (int i = 0; i < childList.size(); i++) {
             Text child = childList.get(i);
             if (child instanceof MutableText) {
-                children[i] = new WrappedFabricComponent((MutableText) child);
+                children[i] = new WrappedFabricComponent(child);
             } else {
                 children[i] = new WrappedFabricComponent(new LiteralText(child.getString()));
             }
@@ -81,14 +85,13 @@ public class WrappedFabricComponent extends WrappedComponent<MutableText> {
     }
 
     @Override
-    public WrappedComponent<MutableText> getCopyWithoutChildren() {
+    public WrappedComponent<Text> getCopyWithoutChildren() {
         MutableText copy = this.getComponent().shallowCopy();
         copy.getSiblings().clear();
         return new WrappedFabricComponent(copy);
     }
 
     @Override
-    @SuppressWarnings("UnstableApiUsage")
     public void handleClick() {
         if (Screen.hasShiftDown() && this.getComponent().getStyle().getInsertion() != null) {
             ChatInputMutateCallback.EVENT.invoker().handle(this.getComponent().getStyle().getInsertion(), false);

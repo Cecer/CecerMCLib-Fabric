@@ -14,7 +14,7 @@ import net.minecraft.util.Identifier;
 
 import java.util.Collection;
 
-public class FabricTextAdapter implements ITextAdapter<MutableText> {
+public class FabricTextAdapter implements ITextAdapter<Text> {
 
     private TextRenderer getFontRenderer() {
         return MinecraftClient.getInstance().textRenderer;
@@ -25,20 +25,20 @@ public class FabricTextAdapter implements ITextAdapter<MutableText> {
         return this.getFontRenderer().getWidth(s);
     }
     @Override
-    public WrappedComponent<MutableText> newRootComponent() {
+    public WrappedComponent<Text> newRootComponent() {
         return new WrappedFabricComponent(new LiteralText(""));
     }
 
     @Override
-    public WrappedComponent<MutableText> adapt(Collection<AbstractXmlTextComponent> parts) {
-        WrappedComponent<MutableText> out = ITextAdapter.super.adapt(parts);
+    public WrappedComponent<Text> adapt(Collection<AbstractXmlTextComponent> parts) {
+        WrappedComponent<Text> out = ITextAdapter.super.adapt(parts);
         if (out == null) {
             out = new WrappedFabricComponent(new LiteralText("Error: Failed to compile XML message!"));
         }
         return out;
     }
     @Override
-    public void appendPart(WrappedComponent<MutableText> fullComponent, TextXmlTextComponent part) {
+    public void appendPart(WrappedComponent<Text> fullComponent, TextXmlTextComponent part) {
         MutableText partComponent = new LiteralText(part.getText());
         
         Style style = partComponent.getStyle()
@@ -88,7 +88,7 @@ public class FabricTextAdapter implements ITextAdapter<MutableText> {
             return HoverEvent.Action.SHOW_ENTITY.buildHoverEvent(JsonParser.parseString(((Hover.Entity) hover).getJson()));
         }
         if (hover instanceof Hover.Segment) {
-            WrappedComponent<MutableText> segment = this.adapt(((Hover.Segment) hover).getComponentList());
+            WrappedComponent<Text> segment = this.adapt(((Hover.Segment) hover).getComponentList());
             return new HoverEvent(HoverEvent.Action.SHOW_TEXT, segment.getComponent());
         }
         throw new IllegalArgumentException("Unsupported hover type: " + hover.getClass().getName());
