@@ -140,7 +140,7 @@ public class MouseInputManager {
     private boolean handleMouseUp(MouseRegionHandler handler, int button) {
         boolean allow = handler.onMouseUp(button);
         if (this.halfPressedButtons.contains(button)) {
-            allow = handler.onClick(button);
+            allow |= handler.onClick(button);
         }
         this.halfPressedButtons.remove(button);
         return allow;
