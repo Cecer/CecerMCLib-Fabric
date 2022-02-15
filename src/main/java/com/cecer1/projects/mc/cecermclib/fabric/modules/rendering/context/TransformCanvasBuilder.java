@@ -66,7 +66,7 @@ public class TransformCanvasBuilder {
     }
 
     public TransformCanvas openTransformation() {
-        TransformCanvas canvas = new TransformCanvas(this.getLastTransformationOrParent(), this.lastTransformations.toArray(new AbstractTransformationCanvas[0]), ctx);
+        TransformCanvas canvas = new TransformCanvas(this.parentCanvas, this.lastTransformations.toArray(new AbstractTransformationCanvas[0]), ctx);
         canvas.open();
         return canvas;
     }
