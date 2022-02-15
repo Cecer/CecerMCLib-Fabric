@@ -2,6 +2,8 @@ package com.cecer1.projects.mc.cecermclib.fabric.modules.rendering.context;
 
 public abstract class AbstractCanvas {
 
+    protected StackTraceElement[] openTrace;
+    
     protected final AbstractCanvas parentCanvas;
     public AbstractCanvas getParentCanvas() {
         return this.parentCanvas;
@@ -12,6 +14,14 @@ public abstract class AbstractCanvas {
     protected AbstractCanvas(AbstractCanvas parentCanvas, RenderContext ctx) {
         this.parentCanvas = parentCanvas;
         this.ctx = ctx;
+    }
+    
+    protected void setOpenTrace() {
+        // TODO: Disable this during normal operation
+        this.openTrace = Thread.currentThread().getStackTrace();
+    }
+    public StackTraceElement[] getOpenTrace() {
+        return this.openTrace;
     }
 
     public TransformCanvasBuilder transform() {

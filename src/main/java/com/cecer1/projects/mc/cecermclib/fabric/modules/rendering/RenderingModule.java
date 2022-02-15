@@ -8,6 +8,7 @@ import com.cecer1.projects.mc.cecermclib.common.modules.text.TextModule;
 import com.cecer1.projects.mc.cecermclib.fabric.environment.FabricClientEnvironment;
 import com.cecer1.projects.mc.cecermclib.fabric.modules.input.InputModule;
 import com.cecer1.projects.mc.cecermclib.fabric.modules.input.mouse.MouseRegionHandler;
+import com.cecer1.projects.mc.cecermclib.fabric.modules.rendering.context.AbstractCanvas;
 import com.cecer1.projects.mc.cecermclib.fabric.modules.rendering.context.AbstractStandardCanvas;
 import com.cecer1.projects.mc.cecermclib.fabric.modules.rendering.context.RenderContext;
 import com.cecer1.projects.mc.cecermclib.fabric.modules.rendering.context.RootCanvas;
@@ -62,13 +63,15 @@ public class RenderingModule implements IModule {
             channel.log("A crash was ignored during rendering. Expect instability and errors until the game is restarted!");
             e.printStackTrace();
             
-            Stack<StackTraceElement[]> canvasStack = this.currentRenderContext.getCanvasStack();
-            if (!canvasStack.isEmpty()) {
+            
+            Stack<AbstractCanvas> canvases = this.currentRenderContext.getLastCanvases();
+            if (!canvases.isEmpty()) {
                 channel.log("Dumping canvas stack:");
-                while (!canvasStack.isEmpty()) {
-                    final StackTraceElement[] trace = canvasStack.pop();
-                    channel.log("  " + trace[0]);
-                    for (int i = 1; i < trace.length; i++) {
+                while (!canvases.isEmpty()) {
+                    final AbstractCanvas canvas = canvases.pop();
+                    channel.log("  " + canvas.getClass().getName());
+                    StackTraceElement[] trace = canvas.getOpenTrace();
+                    for (int i = 0; i < trace.length; i++) {
                         channel.log("    " + trace[i]);
                     }
                 }

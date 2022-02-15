@@ -11,7 +11,7 @@ public abstract class AbstractStandardCanvas extends AbstractCanvas implements A
      * @return This canvas
      */
     public AbstractStandardCanvas open() {
-        this.ctx.getMatrixStack().push();
+        this.setOpenTrace();
         this.ctx.pushCanvas(this);
         return this;
     }

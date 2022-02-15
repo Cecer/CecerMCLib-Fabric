@@ -20,13 +20,18 @@ public class TransformCanvasBuilder {
         this.ctx = ctx;
         this.lastTransformations = new ArrayList<>();
     }
-    
+
+    private void addTransformation(AbstractTransformationCanvas transformationCanvas) {
+        transformationCanvas.setOpenTrace();
+        this.lastTransformations.add(transformationCanvas);
+    }
+
     private AbstractCanvas getLastTransformationOrParent() {
         return this.lastTransformations.isEmpty() ? this.parentCanvas : this.lastTransformations.get(this.lastTransformations.size()-1);
     }
 
     public TransformCanvasBuilder translate(int x, int y) {
-        this.lastTransformations.add(new TranslateTransformationCanvas(this.getLastTransformationOrParent(), this.ctx, x, y));
+        this.addTransformation(new TranslateTransformationCanvas(this.getLastTransformationOrParent(), this.ctx, x, y));
         return this;
     }
 
@@ -47,7 +52,7 @@ public class TransformCanvasBuilder {
         return this.relativeResize(deltaX, deltaY, false);
     }
     public TransformCanvasBuilder relativeResize(int deltaX, int deltaY, boolean allowGrowth) {
-        this.lastTransformations.add(new RelativeResizeTransformationCanvas(this.getLastTransformationOrParent(), this.ctx, deltaX, deltaY, allowGrowth));
+        this.addTransformation(new RelativeResizeTransformationCanvas(this.getLastTransformationOrParent(), this.ctx, deltaX, deltaY, allowGrowth));
         return this;
     }
 
@@ -56,7 +61,7 @@ public class TransformCanvasBuilder {
     }
 
     public TransformCanvasBuilder scale(float scaleFactor) {
-        this.lastTransformations.add(new ScaleTransformationCanvas(this.getLastTransformationOrParent(), this.ctx, scaleFactor));
+        this.addTransformation(new ScaleTransformationCanvas(this.getLastTransformationOrParent(), this.ctx, scaleFactor));
         return this;
     }
 

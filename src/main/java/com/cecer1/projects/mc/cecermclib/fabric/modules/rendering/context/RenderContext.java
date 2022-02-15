@@ -14,14 +14,14 @@ public class RenderContext {
     
     private float partialTicks;
     private WrappedComponent<?> hoverTextComponent;
-    private Stack<StackTraceElement[]> canvasStack;
+    private Stack<AbstractCanvas> lastCanvases; // Used for logging in the event of exceptions during rendering
     
     private AbstractCanvas canvas;
 
     public RenderContext(MatrixStack matrixStack, float partialTicks) {
         this.matrixStack = matrixStack;
         this.partialTicks = partialTicks;
-        this.canvasStack = new Stack<>();
+        this.lastCanvases = new Stack<>();
         
         this.pushCanvas(new RootCanvas(this));
     }
@@ -37,17 +37,22 @@ public class RenderContext {
         return this.canvas;
     }
     void pushCanvas(AbstractCanvas canvas) {
+        if (!this.lastCanvases.isEmpty()) {
+            while (this.lastCanvases.peek() != this.canvas) {
+                this.lastCanvases.pop();
+            }
+        }
+        
+        this.lastCanvases.push(canvas);
         this.canvas = canvas;
-        this.canvasStack.push(new Exception().getStackTrace()); // TODO: Disable this during normal operation
     }
     void popCanvas() {
         this.canvas = this.canvas.getParentCanvas();
-        this.canvasStack.pop(); // TODO: Disable this during normal operation
     }
 
     @InternalUseOnly
-    public Stack<StackTraceElement[]> getCanvasStack() {
-        return this.canvasStack;
+    public Stack<AbstractCanvas> getLastCanvases() {
+        return this.lastCanvases;
     }
 
     public WrappedComponent<?> getHoverTextComponent() {
