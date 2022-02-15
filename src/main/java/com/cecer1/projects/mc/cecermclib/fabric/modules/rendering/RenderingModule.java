@@ -3,6 +3,7 @@ package com.cecer1.projects.mc.cecermclib.fabric.modules.rendering;
 import com.cecer1.projects.mc.cecermclib.common.CecerMCLib;
 import com.cecer1.projects.mc.cecermclib.common.environment.AbstractEnvironment;
 import com.cecer1.projects.mc.cecermclib.common.modules.IModule;
+import com.cecer1.projects.mc.cecermclib.common.modules.logger.LoggerModule;
 import com.cecer1.projects.mc.cecermclib.common.modules.text.TextModule;
 import com.cecer1.projects.mc.cecermclib.fabric.environment.FabricClientEnvironment;
 import com.cecer1.projects.mc.cecermclib.fabric.modules.input.InputModule;
@@ -19,6 +20,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.profiler.Profiler;
 
 import java.util.Set;
+import java.util.Stack;
 
 public class RenderingModule implements IModule {
 
@@ -52,9 +54,30 @@ public class RenderingModule implements IModule {
     }
 
     private void renderGameOverlay(MatrixStack matrices, float tickDelta) {
-        this.beingFrame(matrices, tickDelta);
-        GameOverlayRenderCallback.EVENT.invoker().handle(this.currentRenderContext);
-        this.endFrame();
+        try {
+            this.beingFrame(matrices, tickDelta);
+            GameOverlayRenderCallback.EVENT.invoker().handle(this.currentRenderContext);
+        } catch (Exception e) {
+            LoggerModule.Channel channel = CecerMCLib.get(LoggerModule.class).getChannel(RenderingModule.class);
+            channel.log("A crash was ignored during rendering. Expect instability and errors until the game is restarted!");
+            e.printStackTrace();
+            
+            Stack<StackTraceElement[]> canvasStack = this.currentRenderContext.getCanvasStack();
+            if (!canvasStack.isEmpty()) {
+                channel.log("Dumping canvas stack:");
+                while (!canvasStack.isEmpty()) {
+                    final StackTraceElement[] trace = canvasStack.pop();
+                    channel.log("  " + trace[0]);
+                    for (int i = 1; i < trace.length; i++) {
+                        channel.log("    " + trace[i]);
+                    }
+                }
+            } else {
+                channel.log("No canvas stack found!");
+            }
+        } finally {
+            this.endFrame();
+        }
     }
 
     private RenderContext currentRenderContext;
