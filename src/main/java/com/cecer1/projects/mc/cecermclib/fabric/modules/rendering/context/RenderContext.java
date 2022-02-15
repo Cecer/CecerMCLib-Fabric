@@ -22,8 +22,10 @@ public class RenderContext {
         this.matrixStack = matrixStack;
         this.partialTicks = partialTicks;
         this.lastCanvases = new Stack<>();
-        
-        this.pushCanvas(new RootCanvas(this));
+
+        RootCanvas rootCanvas = new RootCanvas(this);
+        rootCanvas.setOpenTrace();
+        this.pushCanvas(rootCanvas);
     }
 
     public MatrixStack getMatrixStack() {
