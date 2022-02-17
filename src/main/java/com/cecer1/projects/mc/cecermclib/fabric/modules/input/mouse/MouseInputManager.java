@@ -33,7 +33,7 @@ public class MouseInputManager {
             if (this.lastMouseX != -1) {
                 MinecraftClient mc = MinecraftClient.getInstance();
                 int trueMouseX = (int) mc.mouse.getX();
-                int trueMouseY = (int) (mc.getWindow().getHeight() - mc.mouse.getY());
+                int trueMouseY = (int) mc.mouse.getY();
                 
                 if (this.lastMouseX != trueMouseX || this.lastMouseY != trueMouseY) {
                     this.onMouseMove(trueMouseX, trueMouseY);
