@@ -143,8 +143,8 @@ public class SmartTexture {
         int xStart = this.coordRescaler.scaleX(slot.x(), width);
         int xEnd = this.coordRescaler.scaleX(slot.x() + slot.width(), width);
         
-        int yStart = this.coordRescaler.scaleX(slot.y(), height);
-        int yEnd = this.coordRescaler.scaleX(slot.y() + slot.height(), height);
+        int yStart = this.coordRescaler.scaleY(slot.y(), height);
+        int yEnd = this.coordRescaler.scaleY(slot.y() + slot.height(), height);
         return ctx.getCanvas().transform()
                 .margin(yStart,
                         width - xEnd,
