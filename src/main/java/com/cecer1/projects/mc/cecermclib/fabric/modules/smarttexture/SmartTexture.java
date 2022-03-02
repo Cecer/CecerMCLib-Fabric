@@ -137,16 +137,14 @@ public class SmartTexture {
         return ctx.getCanvas().transform().openTransformation();
     }
     public TransformCanvas selectSlot(@NotNull Slot slot, RenderContext ctx) {
-        int width = ctx.getCanvas().getWidth();
-        int height = ctx.getCanvas().getHeight();
-
-        int minX = this.coordRescaler.scaleX(slot.x(), width);
-        int minY = this.coordRescaler.scaleY(slot.y(), height);
-        int maxX = this.coordRescaler.scaleX(slot.x() + slot.width(), width);
-        int maxY = this.coordRescaler.scaleY(slot.y() + slot.height(), height);
         return ctx.getCanvas().transform()
-                .translate(minX, minY)
-                .absoluteResize(maxX - minX, maxY - minY, true)
+                .translate(
+                        this.coordRescaler.scaleX(slot.x(), ctx.getCanvas().getWidth()),
+                        this.coordRescaler.scaleY(slot.y(), ctx.getCanvas().getHeight()))
+                .margin(slot.x(),
+                        (this.textureWidth - slot.width()) - slot.x(), 
+                        (this.textureHeight - slot.height()) - slot.y(),
+                        slot.y())
                 .openTransformation();
     }
 
