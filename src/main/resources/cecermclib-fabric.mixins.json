@@ -6,6 +6,7 @@
     "mixins": [
     ],
     "client": [
+        "rendering.EndFrameMixin"
     ],
     "injectors": {
         "defaultRequire": 1

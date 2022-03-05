@@ -15,7 +15,6 @@ import com.cecer1.projects.mc.cecermclib.fabric.modules.rendering.context.RootCa
 import com.google.common.collect.Sets;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.profiler.Profiler;
@@ -42,21 +41,21 @@ public class RenderingModule implements IModule {
     @Override
     public void onModuleRegister() {
         HudRenderCallback.EVENT.register(this::renderGameOverlay);
-        ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
-            ScreenEvents.beforeRender(screen).register((ignore, matrices, mouseX, mouseY, tickDelta) -> {
-                if (MinecraftClient.getInstance().currentScreen == null) {
-                    this.renderGameOverlay(matrices, tickDelta);
-                }
-            });
+        
+//        ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
+//            ScreenEvents.beforeRender(screen).register((ignore, matrices, mouseX, mouseY, tickDelta) -> {
+//                if (MinecraftClient.getInstance().currentScreen == null) {
+//                    this.renderGameOverlay(matrices, tickDelta);
+//                }
+//            });
 //            ScreenEvents.afterRender(screen).register((ignore, matrices, mouseX, mouseY, tickDelta) -> {
 //                this.drawTest(matrices, mouseX, mouseY, tickDelta, scaledWidth, scaledHeight, true);
 //            });
-        });
+//        });
     }
 
     private void renderGameOverlay(MatrixStack matrices, float tickDelta) {
         try {
-            this.beingFrame(matrices, tickDelta);
             GameOverlayRenderCallback.EVENT.invoker().handle(this.currentRenderContext);
         } catch (Exception e) {
             LoggerModule.Channel channel = CecerMCLib.get(LoggerModule.class).getChannel(RenderingModule.class);
@@ -78,14 +77,12 @@ public class RenderingModule implements IModule {
             } else {
                 channel.log("No canvas stack found!");
             }
-        } finally {
-            this.endFrame();
         }
     }
 
     private RenderContext currentRenderContext;
 
-    void beingFrame(MatrixStack matrixStack, float partialTicks) {
+    public void beginFrame(MatrixStack matrixStack, float partialTicks) {
         Profiler mcProfiler = MinecraftClient.getInstance().getProfiler();
         mcProfiler.push("cecermclib");
         mcProfiler.push("rendering");
@@ -93,7 +90,11 @@ public class RenderingModule implements IModule {
         CecerMCLib.get(InputModule.class).getMouseInputManager().clearHandlers();
         this.currentRenderContext = new RenderContext(matrixStack, partialTicks);
     }
-    void endFrame() {
+    public void endFrame() {
+        if (this.currentRenderContext == null) {
+            return;
+        }
+        
         this.renderMouseInputDebug(this.currentRenderContext);
         this.currentRenderContext = null;
 
