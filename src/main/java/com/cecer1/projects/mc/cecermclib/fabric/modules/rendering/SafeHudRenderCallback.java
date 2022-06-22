@@ -4,10 +4,10 @@ import com.cecer1.projects.mc.cecermclib.common.events.CMLEvent;
 import com.cecer1.projects.mc.cecermclib.common.events.CMLEventFactory;
 import com.cecer1.projects.mc.cecermclib.fabric.modules.rendering.context.RenderContext;
 
-public interface GameOverlayRenderCallback {
-    CMLEvent<GameOverlayRenderCallback> EVENT = CMLEventFactory.createArrayBacked(GameOverlayRenderCallback.class, 
+public interface SafeHudRenderCallback {
+    CMLEvent<SafeHudRenderCallback> EVENT = CMLEventFactory.createArrayBacked(SafeHudRenderCallback.class, 
         listeners -> (renderContext) -> {
-            for (GameOverlayRenderCallback listener : listeners) {
+            for (SafeHudRenderCallback listener : listeners) {
                 listener.handle(renderContext);
             }
         });

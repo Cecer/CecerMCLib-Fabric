@@ -3,12 +3,6 @@
     "minVersion": "0.8",
     "package": "com.cecer1.projects.mc.cecermclib.fabric.environment.mixin",
     "compatibilityLevel": "JAVA_17",
-    "mixins": [
-    ],
     "client": [
-        "rendering.EndFrameMixin"
-    ],
-    "injectors": {
-        "defaultRequire": 1
-    }
+    ]
 }
